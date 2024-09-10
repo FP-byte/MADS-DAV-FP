@@ -1,0 +1,55 @@
+[project]
+name = "wa-analyzer"
+version = "0.3.0"
+description = "Code for the Master of Applied Data Science course Data Analysis and Visualization"
+authors = [
+    {name = "Raoul Grouls", email = "Raoul.Grouls@han.nl"},
+]
+dependencies = [
+    "seaborn>=0.13.1",
+    "numpy>=1.26.3",
+    "jupyter>=1.0.0",
+    "pydantic>=2.5.3",
+    "pandas>=2.2.0",
+    "loguru>=0.7.2",
+    "pyarrow>=15.0.0",
+    "plotly>=5.18.0",
+    "click>=8.1.7",
+    "mads-datasets>=0.3.10",
+    "scikit-learn>=1.4.0",
+    "statsmodels>=0.14.1",
+    "streamlit>=1.31.1",
+]
+
+requires-python = ">=3.11,<3.12"
+readme = "README.md"
+license = {text = "MIT"}
+
+[project.scripts]
+"analyzer" = "wa_analyzer.preprocess:main"
+
+[project.optional-dependencies]
+huggingface = [
+    "transformers>=4.38.2",
+    "torch>=2.2.1",
+    "sentence-transformers>=2.5.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/wa_analyzer"]
+
+[tool.mypy]
+allow_redefinition = true
+ignore_missing_imports = true
+pretty = true
