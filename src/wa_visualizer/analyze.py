@@ -1,18 +1,17 @@
 import datetime
 
-
-class Visualization:
+class Visualizer:
     
-    def calc_messages(df):
-    topk = list(df[df["is_topk"]].author.unique())
-    p = df.groupby("year-week").count()     #group by the isoweeks
-    min_ts = df["timestamp"].min()
-    max_ts = df["timestamp"].max()
-    new_index = pd.date_range(start=min_ts, end=max_ts, freq='W', name="year-week").strftime('%Y-%W')
-    p = p.reindex(new_index, fill_value=0)
+    def calc_messages(self, df):
+        topk = list(df[df["is_topk"]].author.unique())
+        p = df.groupby("year-week").count()     #group by the isoweeks
+        min_ts = df["timestamp"].min()
+        max_ts = df["timestamp"].max()
+        new_index = pd.date_range(start=min_ts, end=max_ts, freq='W', name="year-week").strftime('%Y-%W')
+        p = p.reindex(new_index, fill_value=0)
     return p
 
-    def visualize_timeserie(p, p_corona):
+    def visualization_week2(self, p, p_corona):
         fig, ax = plt.subplots(figsize=(12, 6))
         sns.scatterplot(data=p, x=p.index, y="timestamp", ax=ax, color='lightblue')
         sns.scatterplot(data=p_corona, x=p_corona.index, y="timestamp", ax=ax)
@@ -25,7 +24,7 @@ class Visualization:
         # Define the x-coordinates for the vertical lines (start and end of the period)
         start = '2020-11' #Tijdelijk verbod passagiersvluchten uit risicogebieden
         end = '2021-01' #lockdown_feestdagen
-        #end = '2021-24' #begin vaccinatie periode - verplichte mondkapje
+
 
         # Add vertical lines
         ax.axvline(x=start,  linestyle='--', label='Start corona-beperkingen')
@@ -55,9 +54,12 @@ class Visualization:
         #ax.legend()
 
         plt.show()
-    
 
-if "__init__" == "main":
+    def visualization_week2(self, df):
+        self.calc_messages(df)
+
+
+if __name__ == "__main__":
     visual = Visualization()
     configfile = Path("../config.toml").resolve()
 
@@ -88,6 +90,3 @@ if not datafile.exists():
     p = calc_messages(df)
     p_corona= calc_messages(df_corona)
     visualize_timeserie(p, p_corona)
-
-    if __name__ == "__main__":
-        

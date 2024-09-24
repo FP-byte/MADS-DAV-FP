@@ -1,9 +1,9 @@
 [project]
-name = "wa-analyzer"
+name = "wa-visualizer"
 version = "0.3.0"
 description = "Code for the Master of Applied Data Science course Data Analysis and Visualization"
 authors = [
-    {name = "Raoul Grouls", email = "Raoul.Grouls@han.nl"},
+    {name = "Francesca Paulin", email = "fpaulin22@gmail.com"},
 ]
 dependencies = [
     "seaborn>=0.13.1",
@@ -26,7 +26,8 @@ readme = "README.md"
 license = {text = "MIT"}
 
 [project.scripts]
-"analyzer" = "wa_analyzer.preprocess:main"
+"visualizer" = "wa_analyzer.preprocess:main"
+
 
 [project.optional-dependencies]
 huggingface = [
@@ -47,7 +48,7 @@ dev-dependencies = []
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/wa_analyzer"]
+packages = ["src/wa_visualizer"]
 
 [tool.mypy]
 allow_redefinition = true
