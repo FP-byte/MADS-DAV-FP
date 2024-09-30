@@ -19,6 +19,7 @@ dependencies = [
     "scikit-learn>=1.4.0",
     "statsmodels>=0.14.1",
     "streamlit>=1.31.1",
+    "joypy>=0.2.6",
 ]
 
 requires-python = ">=3.11,<3.12"
