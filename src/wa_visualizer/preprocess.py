@@ -18,6 +18,7 @@ nlp_nl = spacy.load("nl_core_news_sm")
 class Visualizer:
     def __init__(self, datafile):
         self.datafile=datafile
+        self.whatsapp_topics={}
 
     
     def calc_messages(self, df):
@@ -211,38 +212,28 @@ class Visualizer:
         df['contains_place'] = df2['message'].str.contains('trein|hilversum|amsterdam|thuis|huis|ik ben in', case=False, regex=True)
         df3 = df2[~df2[['contains_eten']].all(axis=1)]
         df['contains_people'] = df3['message'].str.contains('irene|lorenzo|papa|mama|nonno|nonna|giacomo|opa|oma', case=False, regex=True)
-        whatsapp_topics = {
+        self.whatsapp_topics = {
     'food': df[df['contains_eten'].fillna(False)]['hour'].value_counts().sort_index(),
     'plans': df[df['contains_plans'].fillna(False)]['hour'].value_counts().sort_index(),
     'place': df[df['contains_place'].fillna(False)]['hour'].value_counts().sort_index(),
     'people': df[df['contains_people'].fillna(False)]['hour'].value_counts().sort_index(),
          }
-         # Convert to DataFrames
-        hour_counts1 = pd.Series(whatsapp_topics['food'])
-        hour_counts2 = pd.Series(whatsapp_topics['plans'])
-        hour_counts3 = pd.Series(whatsapp_topics['place'])
-        hour_counts4 = pd.Series(whatsapp_topics['people'])
-
 
         # Convert to DataFrames
-        hour_counts1 = pd.Series(whatsapp_topics['food'], name='Food')
-        hour_counts2 = pd.Series(whatsapp_topics['plans'], name='Plans')
-        hour_counts3 = pd.Series(whatsapp_topics['place'], name='Places')
-        hour_counts4 = pd.Series(whatsapp_topics['people'], name='People')
+        hour_counts1 = pd.Series(self.whatsapp_topics['food'], name='Food')
+        hour_counts2 = pd.Series(self.whatsapp_topics['plans'], name='Plans')
+        hour_counts3 = pd.Series(self.whatsapp_topics['place'], name='Places')
+        hour_counts4 = pd.Series(self.whatsapp_topics['people'], name='People')
 
 
         # Create a DataFrame and reindex to ensure all hours are included
         df_counts = pd.DataFrame({
-            #'Parents': hour_counts5,
             'Food': hour_counts1,
             'Plans': hour_counts2,
             
             'People': hour_counts4,
             'Places': hour_counts3,
             
-            
-            #'Mama': hour_counts5,
-            #'Papa': hour_counts5,
         }).fillna(0).reindex(range(24), fill_value=0)
 
         plt.figure(figsize=(12, 6))
@@ -285,48 +276,10 @@ def main(week):
         if week.lower()=="3":
             visualizer.visualization_week3()
 
-def remove_stopwords(df, languages=False:list, path='', column = "Message"):
-    """ Remove stopwords from a dataframe choosing
-    a specific column in which to remove those words
-    
-    Parameters:
-    -----------
-    df : pandas dataframe
-        Dataframe of counts per word per user
-    path : string, default ''
-        Path of the file that contains the stopwords
-    language : str, default False
-        The language to be used in the built-in nltk stopwords
-    column : string, default 'Word'
-        Column to clean
-
-    Returns:
-    --------
-    df : pandas dataframe
-        Dataframe of counts per word per user
-        excluding the stopwords
-    
-    """
-
-    if languages:
-        for language in languages and language in nltk_stopwords.fileids():
-            try:
-                stopwords = nltk_stopwords.words(language)
-            except:
-                languages = nltk_stopwords.fileids()
-                raise Exception(f"{langugage} is not recognized.")
-
-    else:
-        with open(path) as stopwords:
-            stopwords = stopwords.readlines()
-            stopwords = [word[:-1] for word in stopwords]
-
-    df = df[~df[column].isin(stopwords)]
-    
-    return df
-
-    
+        if week.lower()=="4":
+            visualizer.visualization_week4()
         
+       
 
 
 if __name__ == "__main__": 
