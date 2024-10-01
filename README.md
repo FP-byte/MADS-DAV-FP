@@ -17,5 +17,9 @@ which python
 After this, you can run the visualization with the following command, indicating the week number for the visualisation you want to see (number 1-7):
 
 ```bash
-analyzer --week <nr>
+visualizer --week <nr>
+```
+
+```bash
+visualizer all # to run all the visualizations
 ```

@@ -1,4 +1,3 @@
-import click
 import datetime
 from pathlib import Path
 import tomllib
@@ -6,19 +5,23 @@ from loguru import logger
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import spacy
-from spacy.lang.it.stop_words import STOP_WORDS as italian_stopwords
-from spacy.lang.nl.stop_words import STOP_WORDS as dutch_stopwords
+import click
+from wa_visualizer.basis import DataObject
+# ##import spacy
+# from spacy.lang.it.stop_words import STOP_WORDS as italian_stopwords
+# from spacy.lang.nl.stop_words import STOP_WORDS as dutch_stopwords
 
-# Load spaCy models for Italian and Dutch
-nlp_it = spacy.load("it_core_news_sm")
-nlp_nl = spacy.load("nl_core_news_sm")
+# # Load spaCy models for Italian and Dutch
+# nlp_it = spacy.load("it_core_news_sm")
+# nlp_nl = spacy.load("nl_core_news_sm")
 
 
-class Visualizer:
+class Visualizer(DataObject):
     def __init__(self, datafile):
-        self.datafile=datafile
+       # self.datafile=datafile
+        super().__init__(datafile)
         self.whatsapp_topics={}
+
 
     
     def calc_messages(self, df):
@@ -87,7 +90,8 @@ class Visualizer:
 
 
     def prepocess_week2(self):
-        df = pd.read_parquet(self.datafile)
+        #df =  pd.read_parquet(self.datafile)
+        df = self.df
         df["date"] = df["timestamp"].dt.date
         df["isoweek"] = df["timestamp"].dt.isocalendar().week
         df["year-week"] = df["timestamp"].dt.strftime("%Y-%W")
@@ -105,7 +109,8 @@ class Visualizer:
         end_date = datetime.datetime.strptime('2021-01-15', "%Y-%m-%d").date()
 
         df_corona = self.select_dates(df, start_date, end_date)
-        
+
+        self.df = df
         return df, df_corona
 
     def visualization_week1(self):
@@ -113,46 +118,46 @@ class Visualizer:
         pass
 
     def remove_stopwords_in_df(df, languages=False, path='', column = "Word"):
-    """ Remove stopwords from a dataframe choosing
-    a specific column in which to remove those words
-    
-    Parameters:
-    -----------
-    df : pandas dataframe
-        Dataframe of counts per word per user
-    path : string, default ''
-        Path of the file that contains the stopwords
-    language : str, default False
-        The language to be used in the built-in nltk stopwords
-    column : string, default 'Word'
-        Column to clean
+        """ Remove stopwords from a dataframe choosing
+        a specific column in which to remove those words
+        
+        Parameters:
+        -----------
+        df : pandas dataframe
+            Dataframe of counts per word per user
+        path : string, default ''
+            Path of the file that contains the stopwords
+        language : str, default False
+            The language to be used in the built-in nltk stopwords
+        column : string, default 'Word'
+            Column to clean
 
-    Returns:
-    --------
-    df : pandas dataframe
-        Dataframe of counts per word per user
-        excluding the stopwords
-    
-    """
+        Returns:
+        --------
+        df : pandas dataframe
+            Dataframe of counts per word per user
+            excluding the stopwords
+        
+        """
 
-    if languages:
-        for language in languages:
+        if languages:
+            for language in languages:
 
-            try:
-                stopwords = nltk_stopwords.words(language)
-            except:
-                languages = nltk_stopwords.fileids()
-                raise Exception(f"Stopwords for {language} not found.")
+                try:
+                    stopwords = nltk_stopwords.words(language)
+                except:
+                    languages = nltk_stopwords.fileids()
+                    raise Exception(f"Stopwords for {language} not found.")
 
-    else:
-        with open(path) as stopwords:
-            stopwords = stopwords.readlines()
-            stopwords = [word[:-1] for word in stopwords]
+        else:
+            with open(path) as stopwords:
+                stopwords = stopwords.readlines()
+                stopwords = [word[:-1] for word in stopwords]
 
 
-    df = df[~df[column].isin(stopwords)]
-    
-    return df
+        df = df[~df[column].isin(stopwords)]
+        
+        return df
 
     def detect_language(self, text):
         guessed_language = None
@@ -204,6 +209,7 @@ class Visualizer:
         self.visualize_timeseries(p, p_corona)
 
     def visualization_week3(self):
+        df = self.df
         #need to be refactored
         df['hour'] = df['timestamp'].dt.hour
         df['contains_eten'] = df['message'].str.contains('eten|pizza|pasta|mangia|pranzo|cena|prosciutto|kip|latte', case=False, regex=True)
@@ -250,42 +256,47 @@ class Visualizer:
         plt.grid()
         plt.show()
 
+    def visualization_week4(self):
+        pass
 
 
 @click.command()
-@click.option("--week", default="1", help="Device type: iOS or Android")
-def main(week):    
+@click.option("--week", default="1", help="Week number: input 1 to 7")
+@click.option("--all", default="all", help="All visualizations")
+def main(week, all): 
+    possible_options = ['1', '2', '3', '4']
+    if week not in possible_options:
+        raise ValueError('Must be a number between 1 and 7')
 
     configfile = Path("./config.toml").resolve()
     print(configfile)
 
     with configfile.open("rb") as f:
-        config = tomllib.load(f)
+         config = tomllib.load(f)
 
     datafile = (Path(".") / Path(config["processed"]) / config["current"]).resolve()
+
+    
+
     if not datafile.exists():
         logger.warning("Datafile does not exist.")
     else:
+        
         visualizer = Visualizer(datafile)
 
-        if week.lower()=="1":
+        if week.lower()=="1" or all:
             visualizer.visualization_week1()
-        if week.lower()=="2":
+        if week.lower()=="2" or all:
             visualizer.visualization_week2()
 
-        if week.lower()=="3":
+        if week.lower()=="3" or all:
             visualizer.visualization_week3()
 
-        if week.lower()=="4":
+        if week.lower()=="4" or all:
             visualizer.visualization_week4()
         
-       
 
+if __name__ == "__main__":   
 
-if __name__ == "__main__": 
-    
-    
-      
-
-        main()
+        main(week, all)
 

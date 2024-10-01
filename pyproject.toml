@@ -20,6 +20,7 @@ dependencies = [
     "statsmodels>=0.14.1",
     "streamlit>=1.31.1",
     "joypy>=0.2.6",
+    "spacy>=3.7.5",
 ]
 
 requires-python = ">=3.11,<3.12"
