@@ -7,6 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import click
 from wa_visualizer.basis import DataObject
+from visualization_relationships import *
 # ##import spacy
 # from spacy.lang.it.stop_words import STOP_WORDS as italian_stopwords
 # from spacy.lang.nl.stop_words import STOP_WORDS as dutch_stopwords
@@ -16,7 +17,7 @@ from wa_visualizer.basis import DataObject
 # nlp_nl = spacy.load("nl_core_news_sm")
 
 
-class Preprocess(DataObject):
+class Visualizer(DataObject):
     def __init__(self, datafile):
        # self.datafile=datafile
         super().__init__(datafile)
@@ -257,7 +258,9 @@ class Preprocess(DataObject):
         plt.show()
 
     def visualization_week4(self):
-        pass
+        df = self.df
+        return visualization_relationships(df)
+        
 
 
 @click.command()
@@ -281,8 +284,7 @@ def main(week, all):
     if not datafile.exists():
         logger.warning("Datafile does not exist.")
     else:
-        df = Preprocess(datafile)
-        visualizer = Visualizer()
+        visualizer = Visualizer(datafile)
 
         if week.lower()=="1" or all:
             visualizer.visualization_week1()
