@@ -9,9 +9,11 @@ import click
 
 from wa_visualizer.data_processing import Preprocess
 from wa_visualizer.base_visualization import BaseVisualization
-from wa_visualizer.visualize_relationships import *
+
 from wa_visualizer.visualization_2 import TimeSeriesVisualization
 from wa_visualizer.visualization_1 import LanguageUsageVisualization
+from wa_visualizer.visualization_3 import StackPlotVisualization
+from wa_visualizer.visualization_4 import RelationshipsVisualization
 import logging
 
 # Set up the logger
@@ -44,24 +46,18 @@ class Visualizer(Preprocess):
 
     def visualization_week3(self):
        
-
-        plt.figure(figsize=(12, 6))
-        # Define custom colors
-        colors = [  'red', 'gray', 'darkgray', 'lightgray', ]
-
-        plt.stackplot(df_counts.index, df_counts.T, colors=colors, labels=df_counts.columns, alpha=0.6)
-        plt.title("Feeding the Dialogue: How Hunger Fuels Food Conversations")
-        plt.xlabel('Hour of Day')
-        plt.ylabel('Number of messages about topic')
-        plt.xticks(df_counts.index, rotation=45)
-        # Add a legend with a title
-        plt.legend(loc='upper left', title='Topics')
-        plt.grid()
-        plt.show()
+        df_counts = self.preprocess_week3()
+        # Create the visualization instance
+        visualization = StackPlotVisualization(df_counts)
+        visualization.create_plot()
+        visualization.show()
 
     def visualization_week4(self):
         df = self.df
-        return visualization_relationships(df)
+        visualization = RelationshipsVisualization(df)
+        visualization.create_plot()
+        visualization.show()
+
         
 
 
@@ -69,12 +65,11 @@ class Visualizer(Preprocess):
 @click.option("--week", default="1", help="Week number: input 1 to 7")
 @click.option("--all", default="all", help="All visualizations")
 def main(week, all): 
-    possible_options = ['1', '2', '3', '4']
+    possible_options = ['1', '2', '3', '4', '5', '6', '7']
     if week not in possible_options:
         raise ValueError('Must be a number between 1 and 7')
 
     configfile = Path("./config.toml").resolve()
-    print(configfile)
 
     with configfile.open("rb") as f:
          config = tomllib.load(f)

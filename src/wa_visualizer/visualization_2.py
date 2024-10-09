@@ -14,7 +14,7 @@ class TimeSeriesVisualization(BaseVisualization):
         fig, ax = plt.subplots(figsize=(12, 6))
 
         # Scatter plots
-        sns.scatterplot(data=self.p, x=self.p.index, y="timestamp", ax=ax, color='lightblue')
+        sns.scatterplot(data=self.p, x=self.p.index, y="timestamp", ax=ax, color='red')
         sns.scatterplot(data=self.p_corona, x=self.p_corona.index, y="timestamp", ax=ax)
 
         # Calculate moving averages
@@ -22,7 +22,7 @@ class TimeSeriesVisualization(BaseVisualization):
         self.p_corona["moving_avg"] = self.p_corona["timestamp"].rolling(window=1).mean()
 
         # Line plots for moving averages
-        sns.lineplot(data=self.p, x=self.p.index, y="moving_avg", ax=ax, color='lightblue')
+        sns.lineplot(data=self.p, x=self.p.index, y="moving_avg", ax=ax, color='gray')
         sns.lineplot(data=self.p_corona, x=self.p_corona.index, y="moving_avg", ax=ax)
 
         # Define the x-coordinates for the vertical lines
@@ -30,14 +30,14 @@ class TimeSeriesVisualization(BaseVisualization):
         end = '2021-01'    # End of restrictions
 
         # Add vertical lines
-        ax.axvline(x=start, linestyle='--', label='Start corona-beperkingen')
-        ax.axvline(x=end, linestyle='--', label='End corona-beperkingen')
+        ax.axvline(x=start, linestyle='--', label='Start corona-restrictions', color='gray')
+        ax.axvline(x=end, linestyle='--', label='End corona-restrictions', color='gray')
 
         # Label the vertical lines
         ax.text(start, ax.get_ylim()[1] * 0.9, 'Intelligent lockdown', color='red', 
-                horizontalalignment='right', fontsize=8, rotation=90, verticalalignment='top')
+                horizontalalignment='right', fontsize=10, rotation=90, verticalalignment='top')
         ax.text(end, ax.get_ylim()[1] * 0.9, 'Christmas lockdown', color='red', 
-                horizontalalignment='center', fontsize=8, rotation=90, verticalalignment='top')
+                horizontalalignment='center', fontsize=10, rotation=90, verticalalignment='top')
 
         # Highlight the area between the two vertical lines
         ax.axvspan(start, end, color='gray', alpha=0.1)
