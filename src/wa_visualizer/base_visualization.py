@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 from abc import ABC, abstractmethod
+from loguru import logger
 
 class BaseVisualization(ABC):
     def __init__(self, data):

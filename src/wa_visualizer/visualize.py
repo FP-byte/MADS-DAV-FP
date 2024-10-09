@@ -10,9 +10,13 @@ import click
 from wa_visualizer.data_processing import Preprocess
 from wa_visualizer.base_visualization import BaseVisualization
 from wa_visualizer.visualize_relationships import *
-from wa_visualizer.visualize_categories import *
-from wa_visualizer.visualize_timeseries import *
+from wa_visualizer.visualization_2 import TimeSeriesVisualization
 from wa_visualizer.visualization_1 import LanguageUsageVisualization
+import logging
+
+# Set up the logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class Visualizer(Preprocess):
@@ -26,50 +30,17 @@ class Visualizer(Preprocess):
         self.custom_colors = ['#FF9999', '#66B3FF', '#99FF99']
         visualization1 = LanguageUsageVisualization(self.df)
         visualization1.create_plot()
-        visualization1.show()
-        # 
-        # ## Grouping by author and language
-        # user_language_counts = self.df.groupby(['author', 'language']).size().unstack(fill_value=0)
-
-        # # Combine 'NL' and 'IT' into 'Verbal'
-        # user_language_counts['Verbal'] = user_language_counts[['NL', 'IT']].sum(axis=1)
-
-        # # Drop the original NL and IT columns
-        # user_language_counts.drop(['NL', 'IT'], inplace=True, axis=1)
-
-        # # Calculate the total counts for each author
-        # total_counts = user_language_counts.sum(axis=1)
-
-        # # Calculate percentages
-        # user_language_percentages = user_language_counts.div(total_counts, axis=0) * 100
-
-        # # Print the percentage DataFrame
-        # print(user_language_percentages)
-
-        # # Plotting
-        # ax = user_language_percentages.plot(kind='bar', stacked=False, figsize=(12, 8), color=self.custom_colors)
-        # plt.title('Language Usage Percentage by Author')
-        # plt.ylabel('Percentage (%)')
-        # plt.xlabel('Author')
-        # plt.xticks(rotation=45)
-        # plt.legend(title='Language')
-
-        # # Annotate each bar with the percentage
-        # for p in ax.patches:
-        #     ax.annotate(f'{p.get_height():.1f}%', 
-        #                 (p.get_x() + p.get_width() / 2, p.get_height()), 
-        #                 ha='center', va='bottom', 
-        #                 fontsize=10)
-
-        # plt.tight_layout()
-        # plt.show()
+        visualization1.show()      
   
 
     def visualization_week2(self):
-        df, df_corona = self.prepocess_week2()
+        df_corona, df = self.prepocess_week2()
         p = self.calc_messages(df)
         p_corona = self.calc_messages(df_corona)
-        self.visualize_timeseries(p, p_corona)
+        visualization = TimeSeriesVisualization(p, p_corona)
+        visualization.create_plot()
+        visualization.show()
+        
 
     def visualization_week3(self):
        

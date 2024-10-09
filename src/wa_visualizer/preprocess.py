@@ -1,11 +1,12 @@
 import datetime
 from pathlib import Path
 import tomllib
-from loguru import logger
+#from loguru import logger
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import click
+import logging
 
 from wa_visualizer.basis import DataObject
 from wa_visualizer.visualize import Visualizer
