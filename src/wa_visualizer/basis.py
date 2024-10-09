@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 class DataObject:
     def __init__(self, datafile):
         self.datafile = datafile
