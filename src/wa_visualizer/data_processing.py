@@ -1,4 +1,4 @@
-from wa_visualizer.basis import DataObject
+from wa_visualizer.base_dataobj import DataObject
 import datetime
 from loguru import logger
 import pandas as pd
@@ -166,6 +166,3 @@ class Preprocess(DataObject):
         self.process_dates()
 
 
-    def get_processed_data(self):
-        # Return the processed data
-        return self.data
