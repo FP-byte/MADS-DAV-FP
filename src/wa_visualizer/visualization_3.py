@@ -3,18 +3,31 @@ from wa_visualizer.base_visualization import BaseVisualization
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+import pandas as pd
+import matplotlib.pyplot as plt
+
+class BaseVisualization:
+    def __init__(self, data):
+        self.data = data
+
+    def show(self):
+        plt.show()
+
 class StackPlotVisualization(BaseVisualization):
     def __init__(self, data):
         super().__init__(data)
-        
 
     def create_plot(self):
         # Normalize the data to get percentages
         total_counts = self.data.sum(axis=1)
-        print(total_counts)
-        normalized_data = self.data.div(total_counts, axis=0) * 100
-        print(normalized_data)
+        print("Total counts per hour:", total_counts)
         
+        # Normalize each column by dividing by the total counts for that hour
+        normalized_data = self.data.div(total_counts, axis=0) * 100
+        
+        # Check normalized data
+        print("Normalized data (%):", normalized_data)
+
         plt.figure(figsize=(12, 6))
         
         # Define custom colors
@@ -33,9 +46,11 @@ class StackPlotVisualization(BaseVisualization):
         # Add a legend with a title
         plt.legend(loc='upper left', title='Topics')
         plt.grid()
+        
+        # Save the plot
         filename = "./img/3_distribution_visualization.png"
-        plt.savefig(filename, bbox_inches='tight', transparent=False)
-        plt.close()
+        #plt.savefig(filename, bbox_inches='tight', transparent=False)
+        #plt.close()
 
 # Example usage
 if __name__ == "__main__":

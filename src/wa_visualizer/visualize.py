@@ -59,18 +59,13 @@ class Visualizer(Preprocess):
         df = self.df
         visualization4 = RelationshipsVisualization(df)
         visualization4.create_plot()
-        visualization4.show()
-
-         
-
-        
-
+        visualization4.show()     
 
 @click.command()
 @click.option("--week", default="1", help="Week number: input 1 to 7")
-@click.option("--all", default="all", help="All visualizations")
-def main(week, all): 
-    possible_options = ['1', '2', '3', '4', '5', '6', '7']
+@click.option("--all", default=False, help="All visualizations")
+def main(week, all):
+    possible_options = ["all", '1', '2', '3', '4', '5', '6', '7']
     if week not in possible_options:
         raise ValueError('Must be a number between 1 and 7')
 
@@ -81,26 +76,29 @@ def main(week, all):
 
     datafile = (Path(".") / Path(config["processed"]) / config["current"]).resolve()
 
-    
-
     if not datafile.exists():
         logger.warning("Datafile does not exist.")
     else:
         visualizer = Visualizer(datafile)
 
         if week.lower()=="1" or all:
+            print("week 1")
             visualizer.visualization_week1()
+
         if week.lower()=="2" or all:
+            print("week 2")
             visualizer.visualization_week2()
 
         if week.lower()=="3" or all:
+            print("week 3")
             visualizer.visualization_week3()
 
         if week.lower()=="4" or all:
+            print("week 4")
             visualizer.visualization_week4()
         
 
 if __name__ == "__main__":   
 
-        main(week, all)
+        main(week)
 

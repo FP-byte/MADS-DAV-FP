@@ -52,21 +52,22 @@ class Preprocess(DataObject):
                     break
                 
 
-    def process_languageID(self):
-        
+    def process_languageID(self):       
         self.df['language'] = "Unknown"
         self.df['language'] = self.df['message'].apply(self.guess_language)
+      #  self.df.to_parquet("../data/processed/whatsapp-20240916-104455.parquet")
 
 
     def process_dates(self):    
         self.df["date"] = self.df["timestamp"].dt.date
         self.df["isoweek"] = self.df["timestamp"].dt.isocalendar().week
         self.df["year-week"] = self.df["timestamp"].dt.strftime("%Y-%W")
-     
+       # self.df.to_parquet("../data/processed/whatsapp-20240916-104455.parquet")
 
     def prepocess_week1(self):
         print("processing visual 1")
         self.process_languageID()
+
     
     def select_dates(self, df, start_date, end_date):
         if 'date' in df:

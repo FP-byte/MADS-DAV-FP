@@ -25,7 +25,7 @@ class LanguageUsageVisualization(BaseVisualization):
 
         # Plotting
         ax = user_language_percentages.plot(kind='bar', stacked=False, figsize=(12, 8), color=self.colors)
-        plt.title("Voices in Numbers: Words take over on WhatsApp")
+        plt.title("Voices in Numbers: Whatsapp users use more words than images")
         plt.ylabel('Percentage (%)')
         plt.xlabel('Author')
         plt.xticks(rotation=45)
@@ -38,7 +38,7 @@ class LanguageUsageVisualization(BaseVisualization):
                         ha='center', va='bottom', 
                         fontsize=10)
         filename = "./img/1_categories_visualization.png"
-        plt.savefig(filename, bbox_inches='tight', transparent=False)
-        plt.close()
+        #plt.savefig(filename, bbox_inches='tight', transparent=False)
+        #plt.close()
         
 

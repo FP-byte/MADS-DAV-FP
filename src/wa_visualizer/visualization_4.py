@@ -62,8 +62,8 @@ class RelationshipsVisualization(BaseVisualization):
         g.fig.suptitle("The Emoji Age: Young People Trade Words for Visuals")
         plt.grid(True)
         filename = "./img/4_relationships_visualization.png"
-        plt.savefig(filename, bbox_inches='tight', transparent=False)
-        plt.close()
+        #plt.savefig(filename, bbox_inches='tight', transparent=False)
+        #plt.close()
 
 # Example usage
 if __name__ == "__main__":
