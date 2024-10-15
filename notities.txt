@@ -1,0 +1,66 @@
+embedding: 
+
+Mapping to and from
+F: x --> Z with Z is Rd Reale getal met meerdere dimensies R2 = punt met 2 coördinaten
+g: Z --> M with M onderdeel van R2
+
+First map data to high dimentional space Z (bij. tekst)
+Do some transformations en map it back to the 2 dimentional space R2
+
+de extra dimensies bieden voordelen, je kunt meer informatie kwijt, meer beschrijven
+
+Semantic vectorspace
+Ruimte met meerdere ruimtes en het gebruikt heeft een betekenis
+
+10 tot 68 kaartendek te schudden
+als ik een vector neem van 80 plekjes past dit met gemak in, maar de aantal combinaties is enorm.
+Chatgpt 1500 dimensies (as-stel met meerder dimensies)
+Kan in principe meer informatie maar het wordt complex
+
+Vectorruimte:
+V x V --> V "+" vector optellen
+F x V --> V "." (F= field, scaler) vector vermenigvuldingen
+Vector space satisfies 
+Addition: communtative, associative, identy, inverse
+Multiplication: compatibiity, distributivity, Identity
+
+Matric == afstand
+Non negative
+Identity 
+Simmetry
+Triangle inequality == omwegen maken het niet korter
+
+
+PCA: hoge eigenvalue is beter dan een lagere
+de resultaat is een mix PCA1 bestaat uit onderdelen van het originele x-as
+
+t-SNE is optimized for visualization (mapping R2 or R3) --> behouden van afstanden
+high dimentional data mappen naar lage dimensie
+
+Kans dat elke punt x (laag) en y (hoog) een buurman kiest
+
+Met PCA kan je berekenen hoeveel informatie kan weggooien, 
+t-SNE is gemaakt om 2 of 3 dimensies te berekenen
+
+manhatten distance: distance in blocks, geeft andere beeld in een multidimentionle
+afstand van vingerafdruk, heel eigen afstanden en combinaties
+
+isort --> sorteren inports
+rye add -d isort
+rye add -d mypy (of pyright)
+rye add -d ruff
+
+run: jupyter nbconver --clear-output --inplace 
+
+Error bar:
+std / wortel van aantal berichten
+
+isort src --> formatteert je code
+rye fmt  #gaat je code formatteren
+black format je code
+mypy # controlleer op types in je code (zonder in runtime te hoeven)
+
+
+
+
+

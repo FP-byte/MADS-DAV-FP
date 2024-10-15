@@ -20,6 +20,8 @@ dependencies = [
     "statsmodels>=0.14.1",
     "streamlit>=1.31.1",
     "joypy>=0.2.6",
+    "torch>=2.4.1",
+    "isort>=5.13.2",
 ]
 
 requires-python = ">=3.11,<3.12"
@@ -43,7 +45,13 @@ build-backend = "hatchling.build"
 
 [tool.rye]
 managed = true
-dev-dependencies = []
+dev-dependencies = [
+    "pyright>=1.1.384",
+    "mypy>=1.12.0",
+    "isort>=5.13.2",
+    "ruff>=0.6.9",
+    "black>=24.10.0",
+]
 
 [tool.hatch.metadata]
 allow-direct-references = true

@@ -37,3 +37,8 @@ class LanguageUsageVisualization(BaseVisualization):
                         (p.get_x() + p.get_width() / 2, p.get_height()), 
                         ha='center', va='bottom', 
                         fontsize=10)
+        filename = "./img/1_categories_visualization.png"
+        plt.savefig(filename, bbox_inches='tight', transparent=False)
+        plt.close()
+        
+

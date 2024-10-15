@@ -32,31 +32,36 @@ class Visualizer(Preprocess):
         self.custom_colors = ['#FF9999', '#66B3FF', '#99FF99']
         visualization1 = LanguageUsageVisualization(self.df)
         visualization1.create_plot()
-        visualization1.show()      
+        visualization1.show()
+
   
 
     def visualization_week2(self):
         df_corona, df = self.prepocess_week2()
         p = self.calc_messages(df)
         p_corona = self.calc_messages(df_corona)
-        visualization = TimeSeriesVisualization(p, p_corona)
-        visualization.create_plot()
-        visualization.show()
+        visualization2 = TimeSeriesVisualization(p, p_corona)
+        visualization2.create_plot()
+        visualization2.show()
+
         
 
     def visualization_week3(self):
        
         df_counts = self.preprocess_week3()
         # Create the visualization instance
-        visualization = StackPlotVisualization(df_counts)
-        visualization.create_plot()
-        visualization.show()
+        visualization3 = StackPlotVisualization(df_counts)
+        visualization3.create_plot()
+        visualization3.show()
+
 
     def visualization_week4(self):
         df = self.df
-        visualization = RelationshipsVisualization(df)
-        visualization.create_plot()
-        visualization.show()
+        visualization4 = RelationshipsVisualization(df)
+        visualization4.create_plot()
+        visualization4.show()
+
+         
 
         
 

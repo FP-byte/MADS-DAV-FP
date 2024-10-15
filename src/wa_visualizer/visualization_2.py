@@ -14,7 +14,7 @@ class TimeSeriesVisualization(BaseVisualization):
         fig, ax = plt.subplots(figsize=(12, 6))
 
         # Scatter plots
-        sns.scatterplot(data=self.p, x=self.p.index, y="timestamp", ax=ax, color='red')
+        sns.scatterplot(data=self.p, x=self.p.index, y="timestamp", ax=ax, color='darkgray')
         sns.scatterplot(data=self.p_corona, x=self.p_corona.index, y="timestamp", ax=ax)
 
         # Calculate moving averages
@@ -51,6 +51,9 @@ class TimeSeriesVisualization(BaseVisualization):
         # Add title and legend
         plt.title("Digital Silence: The WhatsApp Whisper During Lockdown")
         ax.legend()
+        filename = "./img/2_timeseries_visualization.png"
+        plt.savefig(filename, bbox_inches='tight', transparent=False)
+        plt.close()
 
 # Example usage
 if __name__ == "__main__":

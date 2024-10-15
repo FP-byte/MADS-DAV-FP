@@ -109,7 +109,9 @@ class Preprocess(DataObject):
             return series.str.contains('|'.join(keywords), case=False, regex=True)
 
     def preprocess_week3(self):
+        print('process week 3')
         df = self.df
+        df_other = {}
         #needs to be refactored
         df['hour'] = df['timestamp'].dt.hour
         # Define keywords for each category
@@ -117,28 +119,41 @@ class Preprocess(DataObject):
         plans_keywords = ['vanavond', 'vandaag', 'morgen', 'afspraak', 'domani', 'stasera']
         place_keywords = ['trein', 'hilversum', 'amsterdam', 'thuis', 'huis', 'ik ben in']
         people_keywords = ['irene', 'lorenzo', 'papa', 'mama', 'nonno', 'nonna', 'giacomo', 'opa', 'oma']
-
+        print(df.shape)
         # Apply keyword checks
         df['contains_eten'] = self.contains_keywords(df['message'], eten_keywords)
+         # Filter DataFrame to remove rows that contain 'eten'
+        
+        df_other = df[~df['contains_eten']]
+        print(df.shape[0]-df_other.shape[0])
+        df = df_other
+        print(df.shape)
         df['contains_plans'] = self.contains_keywords(df['message'], plans_keywords)
 
-        # Filter DataFrame to remove rows that contain 'eten'
-        df2 = df[~df['contains_eten']]
-
+        # Filter DataFrame to remove rows that contain 'plans'
+        df_other = df[~df['contains_eten']]
+        print(df_other.shape)
+        df = df_other
+        print(df.shape)
         # Check for places in the filtered DataFrame
-        df['contains_place'] = self.contains_keywords(df2['message'], place_keywords)
-
-        # Optionally, if you need another filtered DataFrame
-        df3 = df2[~df2['contains_eten']] 
-
-        df['contains_people'] = self.contains_keywords(df3['message'], people_keywords)
-
+        df['contains_place'] = self.contains_keywords(df['message'], place_keywords)
+        df_other = df[~df['contains_place']]
+        df = df_other
+        print(df.shape)
+        
+        df['contains_people'] = self.contains_keywords(df['message'], people_keywords)
+        # Filter DataFrame to remove rows that contain 'people'
+        df_other = df[~df['contains_people']]
+        print(df.shape)
+        print(df_other.shape)
+        
         #create topics counts
         self.whatsapp_topics = {
         'food': df[df['contains_eten'].fillna(False)]['hour'].value_counts().sort_index(),
         'plans': df[df['contains_plans'].fillna(False)]['hour'].value_counts().sort_index(),
         'place': df[df['contains_place'].fillna(False)]['hour'].value_counts().sort_index(),
         'people': df[df['contains_people'].fillna(False)]['hour'].value_counts().sort_index(),
+        'other': df_other['hour'].value_counts().sort_index()
          }
 
         # Convert to DataFrames
@@ -146,13 +161,15 @@ class Preprocess(DataObject):
         hour_counts2 = pd.Series(self.whatsapp_topics['plans'], name='Plans')
         hour_counts3 = pd.Series(self.whatsapp_topics['place'], name='Places')
         hour_counts4 = pd.Series(self.whatsapp_topics['people'], name='People')
+        hour_counts5 = pd.Series(self.whatsapp_topics['other'], name='Other')
 
         # Create a DataFrame and reindex to ensure all hours are included
         df_counts = pd.DataFrame({
             'Food': hour_counts1,
             'Plans': hour_counts2,           
             'People': hour_counts4,
-            'Places': hour_counts3,            
+            'Places': hour_counts3,
+            'Other': hour_counts5           
         }).fillna(0).reindex(range(24), fill_value=0)
         return df_counts
 

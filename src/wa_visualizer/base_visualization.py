@@ -2,12 +2,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from abc import ABC, abstractmethod
 from loguru import logger
-
+#
 class BaseVisualization(ABC):
     def __init__(self, data):
         # Set default colors if none are provided
         self.data = data
-        colors = ['#FF9999', '#66B3FF', '#99FF99']
+        colors = ['gray', 'salmon', 'darkgray']
         self.colors = colors if colors is not None else sns.color_palette("Set3", n_colors=len(data.columns))
 
 
@@ -20,5 +20,6 @@ class BaseVisualization(ABC):
 
     def save(self, filename, transparent=False):
         plt.savefig(filename, bbox_inches='tight', transparent=transparent)
+        plt.close()
 
 

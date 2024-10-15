@@ -6,16 +6,19 @@ import matplotlib.pyplot as plt
 class StackPlotVisualization(BaseVisualization):
     def __init__(self, data):
         super().__init__(data)
+        
 
     def create_plot(self):
         # Normalize the data to get percentages
         total_counts = self.data.sum(axis=1)
+        print(total_counts)
         normalized_data = self.data.div(total_counts, axis=0) * 100
+        print(normalized_data)
         
         plt.figure(figsize=(12, 6))
         
         # Define custom colors
-        colors = ['red', 'gray', 'darkgray', 'lightgray']
+        colors = ['red', 'gray', 'darkgray', 'lightgray', 'white']
         
         # Create the stack plot
         plt.stackplot(normalized_data.index, normalized_data.T, colors=colors, labels=self.data.columns, alpha=0.6)
@@ -24,11 +27,15 @@ class StackPlotVisualization(BaseVisualization):
         plt.title("Feeding the Dialogue: How Hunger Fuels Food Conversations")
         plt.xlabel('Hour of Day')
         plt.ylabel('Percentage of Messages About Topic (%)')
+        
         plt.xticks(normalized_data.index, rotation=45)
         
         # Add a legend with a title
         plt.legend(loc='upper left', title='Topics')
         plt.grid()
+        filename = "./img/3_distribution_visualization.png"
+        plt.savefig(filename, bbox_inches='tight', transparent=False)
+        plt.close()
 
 # Example usage
 if __name__ == "__main__":

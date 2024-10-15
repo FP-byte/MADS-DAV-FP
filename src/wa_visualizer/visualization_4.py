@@ -28,9 +28,7 @@ class RelationshipsVisualization(BaseVisualization):
         # Sort the DataFrame by author
         df_sorted = self.data.sort_values(by='author')
 
-        # Create the scatter plot
-        plt.figure(figsize=(8, 6), facecolor='white')  
-        
+            
         # Create a FacetGrid
         g = sns.FacetGrid(df_sorted, col='emoji_status', hue='category', height=5, aspect=1.5, 
                           palette={'teenager': 'green', 'adult': 'lightgray'})
@@ -63,6 +61,9 @@ class RelationshipsVisualization(BaseVisualization):
         plt.subplots_adjust(top=0.85)
         g.fig.suptitle("The Emoji Age: Young People Trade Words for Visuals")
         plt.grid(True)
+        filename = "./img/4_relationships_visualization.png"
+        plt.savefig(filename, bbox_inches='tight', transparent=False)
+        plt.close()
 
 # Example usage
 if __name__ == "__main__":
