@@ -4,13 +4,11 @@ import matplotlib.pyplot as plt
 
 class LanguageUsageVisualization(BaseVisualization):
     # Les 1: comparing categories
-    def __init__(self, data):
-        super().__init__(data)
 
     def create_plot(self):
         # Grouping by author and language
         user_language_counts = self.data.groupby(['author', 'language']).size().unstack(fill_value=0)
-
+        
         # Combine 'NL' and 'IT' into 'Verbal'
         user_language_counts['Verbal'] = user_language_counts[['NL', 'IT']].sum(axis=1)
 
@@ -25,7 +23,7 @@ class LanguageUsageVisualization(BaseVisualization):
 
         # Plotting
         ax = user_language_percentages.plot(kind='bar', stacked=False, figsize=(12, 8), color=self.colors)
-        plt.title("Voices in Numbers: Whatsapp users use more words than images")
+        plt.title("Voices in Numbers: in Whatsapp ")
         plt.ylabel('Percentage (%)')
         plt.xlabel('Author')
         plt.xticks(rotation=45)
@@ -37,7 +35,7 @@ class LanguageUsageVisualization(BaseVisualization):
                         (p.get_x() + p.get_width() / 2, p.get_height()), 
                         ha='center', va='bottom', 
                         fontsize=10)
-        filename = "./img/1_categories_visualization.png"
+        #filename = "./img/1_categories_visualization.png"
         #plt.savefig(filename, bbox_inches='tight', transparent=False)
         #plt.close()
         

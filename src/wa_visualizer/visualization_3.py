@@ -1,23 +1,14 @@
 import matplotlib.pyplot as plt
-from wa_visualizer.base_visualization import BaseVisualization
-import seaborn as sns
-import matplotlib.pyplot as plt
-
 import pandas as pd
-import matplotlib.pyplot as plt
 
-class BaseVisualization:
-    def __init__(self, data):
-        self.data = data
-
-    def show(self):
-        plt.show()
+from wa_visualizer.base_visualization import BaseVisualization
 
 class StackPlotVisualization(BaseVisualization):
-    def __init__(self, data):
-        super().__init__(data)
+    """Class for stackplots""" 
 
     def create_plot(self):
+        """create stackplot 
+        """      
         # Normalize the data to get percentages
         total_counts = self.data.sum(axis=1)
         print("Total counts per hour:", total_counts)
@@ -49,8 +40,8 @@ class StackPlotVisualization(BaseVisualization):
         
         # Save the plot
         filename = "./img/3_distribution_visualization.png"
-        #plt.savefig(filename, bbox_inches='tight', transparent=False)
-        #plt.close()
+        plt.savefig(filename, bbox_inches='tight', transparent=False)
+        plt.close()
 
 # Example usage
 if __name__ == "__main__":

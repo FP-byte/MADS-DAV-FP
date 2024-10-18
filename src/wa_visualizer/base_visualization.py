@@ -7,7 +7,7 @@ class BaseVisualization(ABC):
     def __init__(self, data):
         # Set default colors if none are provided
         self.data = data
-        colors = ['gray', 'salmon', 'darkgray']
+        colors = ['lightgray', 'salmon', 'gray']
         self.colors = colors if colors is not None else sns.color_palette("Set3", n_colors=len(data.columns))
 
 

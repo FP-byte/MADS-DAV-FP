@@ -100,5 +100,5 @@ def main(week, all):
 
 if __name__ == "__main__":   
 
-        main(week)
+        main(week, all)
 

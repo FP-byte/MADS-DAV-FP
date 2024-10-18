@@ -18,7 +18,6 @@ notebooks/*
 .python-version
 checklist.md
 *.toml
-notebooks/*.ipynb
 src/wa_analyzer/*
 
-notebooks/*.ipynb
+

@@ -2,6 +2,7 @@ from wa_visualizer.base_visualization import BaseVisualization
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+
 class TimeSeriesVisualization(BaseVisualization):
     #Les 2: Time Series visualization
 
@@ -11,10 +12,10 @@ class TimeSeriesVisualization(BaseVisualization):
         self.p_corona = p_corona
 
     def create_plot(self):
-        fig, ax = plt.subplots(figsize=(12, 6))
+        _, ax = plt.subplots(figsize=(12, 6))
 
         # Scatter plots
-        sns.scatterplot(data=self.p, x=self.p.index, y="timestamp", ax=ax, color='darkgray')
+        sns.scatterplot(data=self.p, x=self.p.index, y="timestamp", ax=ax, color='gray')
         sns.scatterplot(data=self.p_corona, x=self.p_corona.index, y="timestamp", ax=ax)
 
         # Calculate moving averages
@@ -37,7 +38,7 @@ class TimeSeriesVisualization(BaseVisualization):
         ax.text(start, ax.get_ylim()[1] * 0.9, 'Intelligent lockdown', color='red', 
                 horizontalalignment='right', fontsize=10, rotation=90, verticalalignment='top')
         ax.text(end, ax.get_ylim()[1] * 0.9, 'Christmas lockdown', color='red', 
-                horizontalalignment='center', fontsize=10, rotation=90, verticalalignment='top')
+                horizontalalignment='left', fontsize=10, rotation=90, verticalalignment='top')
 
         # Highlight the area between the two vertical lines
         ax.axvspan(start, end, color='gray', alpha=0.1)
@@ -51,7 +52,7 @@ class TimeSeriesVisualization(BaseVisualization):
         # Add title and legend
         plt.title("Digital Silence: The WhatsApp Whisper During Lockdown")
         ax.legend()
-        filename = "./img/2_timeseries_visualization.png"
+        #filename = "./img/2_timeseries_visualization.png"
         #plt.savefig(filename, bbox_inches='tight', transparent=False)
         #plt.close()
 
