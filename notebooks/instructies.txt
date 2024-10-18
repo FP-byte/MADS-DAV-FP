@@ -1,0 +1,2 @@
+# sync optionele dependencies
+rye sync --features huggingface

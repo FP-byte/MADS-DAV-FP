@@ -80,6 +80,7 @@ def main(week, all):
         logger.warning("Datafile does not exist.")
     else:
         visualizer = Visualizer(datafile)
+        visualizer.transform_data()
 
         if week.lower()=="1" or all:
             print("week 1")
