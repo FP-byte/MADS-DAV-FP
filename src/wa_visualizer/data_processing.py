@@ -54,7 +54,7 @@ class Preprocess(DataObject):
         Data cleaning logic
         """        
         # remove returns and new lines
-        self.df['message'] = self.df['message'].apply(self.clean_message)
+        self.df['message'] = self.df['message'].appy(self.clean_message)
         #rerun emoticon detection for missing emoij's
         self.df['has_emoji'] =self.df['message'].apply(self.has_emoji)
         

@@ -14,11 +14,10 @@ data/processed/*.parq
 .DS_Store
 *.egg-info
 *reference.json
-notebooks/tests/*
+notebooks/*
 .python-version
 checklist.md
 *.toml
 src/wa_analyzer/*
 
 
-notebooks/.ipynb_checkpoints/*
