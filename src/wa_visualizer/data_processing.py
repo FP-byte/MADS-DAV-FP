@@ -35,18 +35,41 @@ class Preprocess(DataObject):
 
         return bool(emoji_pattern.search(text))
 
-
-    def clean_message(self, text: str)-> str:
+    def find_replace_pattern(self, text:str, pattern:str, replace_str: str='') -> str:
         """_summary_
 
+        Args:
+            text (str): text to edit
+            pattern (str): regex expression to find
+            replace_str (str, optional): text to replace with. Defaults to ''.
+
+        Returns:
+            str: string edited
+        """               
+        return re.sub(pattern, replace_str, text)
+
+    def clean_message(self, text: str)-> str:
+        """
+        clean message texts for specific patterns  
         Args:
             text (str): input text
 
         Returns:
             str: cleaned text
-        """        
+        """       
         #removes return and new lines
-        text = re.sub(r'[\r\n?]', '', text)
+        rn_pattern = r'[\r\n?]'
+        text = self.find_replace_pattern(text, rn_pattern)
+        #remove forwarding of changed telephone number
+        pattern_fwd =  r'^\d{2}-\d{2}-\d{4} \d{2}:\d{2} - \+\d{2} \d{2} \d{4} \d{4}: '
+        text = self.find_replace_pattern(text, pattern_fwd)
+        pattern_fwd_tel = r"@\d{10,13}(?:[ ;:,.]|)"
+        text = re.sub(pattern_fwd_tel, '', text)
+        pattern_email =  r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+        text = re.sub(pattern_email, '', text)
+        username_pattern = r"^@[a-zA-Z0-9._]+"
+        text = re.sub(username_pattern, '', text)
+        
         return text.strip()
     
     def clean_data(self):
@@ -55,8 +78,12 @@ class Preprocess(DataObject):
         """        
         # remove returns and new lines
         self.df['message'] = self.df['message'].appy(self.clean_message)
+        empty_messages = self.df[self.df['message']==""].index
+        self.df.drop(empty_messages, axis=0, inplace=True)
         #rerun emoticon detection for missing emoij's
         self.df['has_emoji'] =self.df['message'].apply(self.has_emoji)
+        #delete empty rows
+        
         
     def save_data(self):
         """
@@ -83,10 +110,10 @@ class Preprocess(DataObject):
 
         guessed_language= "NL"
         for word in text:       
-            if word in self.dutch_stopwords:
+            if word in self.dutch_stopwords+self.dutch_frequentwords:
                 guessed_language = "NL"
                         
-            if word in self.italian_stopwords:
+            if word in self.italian_stopwords+self.italian_frequentwords:
                 guessed_language = "IT"
         #print(f"guessed_language is {guessed_language}")    
         return guessed_language
@@ -165,75 +192,68 @@ class Preprocess(DataObject):
          return series.str.contains('|'.join(keywords), case=False, regex=True)
 
     def preprocess_week3(self):
-        print('process week 3')
+        print('prlaceocess week 3')
         df = self.df
-        df_other = {}
-        #needs to be refactored
+        # Define keywords for each category (selection by hand on the base of frequency and word counts)
+        eten_keywords = ['\beten\b', 'eet', "gegeten", 'blijf eten', 'lunch', 'pizza', 'pasta', 'mangia', 'pranzo', 'cena', 'prosciutto', 'kip', 'latte', 'snack', 'indonesisch', 'kapsalon', 'kps', 'delfino', 'ninh', 'bihn']
+        plans_keywords = ['vanavond', 'vandaag', 'morgen', 'afspraak', 'domani', 'stasera', 'ochtend']
+        place_keywords = ['trein', 'hilversum', 'amsterdam', 'thuis', 'huis', 'ik ben in', 'dallas', 'spanje', 'mexico', 'indonesië', 'hotel', 'onderweg', 'casa']
+        people_keywords = df.author.unique().tolist() + ['papa','mama', 'nonno', 'nonna', 'giacomo', 'opa', 'oma', 'siem', 'tessa', 'ouders']
+        
         df['hour'] = df['timestamp'].dt.hour
-        # Define keywords for each category
-        eten_keywords = ['eten', 'pizza', 'pasta', 'mangia', 'pranzo', 'cena', 'prosciutto', 'kip', 'latte']
-        plans_keywords = ['vanavond', 'vandaag', 'morgen', 'afspraak', 'domani', 'stasera']
-        place_keywords = ['trein', 'hilversum', 'amsterdam', 'thuis', 'huis', 'ik ben in']
-        people_keywords = ['irene', 'lorenzo', 'papa', 'mama', 'nonno', 'nonna', 'giacomo', 'opa', 'oma']
-        print(df.shape)
-        # Apply keyword checks
-        df['contains_eten'] = self.contains_keywords(df['message'], eten_keywords)
-         # Filter DataFrame to remove rows that contain 'eten'
+        df.loc[self.contains_keywords(df['message'], eten_keywords), 'topic'] = 'food'
+        # Filter DataFrame to remove rows that contain 'food'
+        df_food = df[df['topic'] == 'food']
+        df  = df[df['topic'] != 'food']
         
-        df_other = df[~df['contains_eten']]
-        print(df.shape[0]-df_other.shape[0])
-        df = df_other
-        print(df.shape)
-        df['contains_plans'] = self.contains_keywords(df['message'], plans_keywords)
-
         # Filter DataFrame to remove rows that contain 'plans'
-        df_other = df[~df['contains_eten']]
-        print(df_other.shape)
-        df = df_other
-        print(df.shape)
-        # Check for places in the filtered DataFrame
-        df['contains_place'] = self.contains_keywords(df['message'], place_keywords)
-        df_other = df[~df['contains_place']]
-        df = df_other
-        print(df.shape)
-        
-        df['contains_people'] = self.contains_keywords(df['message'], people_keywords)
+        df.loc[self.contains_keywords(df['message'], plans_keywords), 'topic'] = 'plans'
+        df_plans = df[df['topic'] == 'plans']
+        df = df[df['topic'] != 'plans']
+
+        # Filter DataFrame to remove rows that contain 'places'
+        df.loc[self.contains_keywords(df['message'], place_keywords), 'topic'] = 'places'
+        df_places = df[df['topic'] == 'places']
+        df = df[df['topic'] != 'places']
+
         # Filter DataFrame to remove rows that contain 'people'
-        df_other = df[~df['contains_people']]
-        print(df.shape)
-        print(df_other.shape)
-        
+        df.loc[self.contains_keywords(df['message'], people_keywords), 'topic'] = 'people'
+        df_people = df[df['topic'] == 'people']
+        df_other = df[df['topic'] != 'people']   
+
+        #df_all = pd.concat([df_other, df_food, df_plans, df_places, df_people])
         #create topics counts
         self.whatsapp_topics = {
-        'food': df[df['contains_eten'].fillna(False)]['hour'].value_counts().sort_index(),
-        'plans': df[df['contains_plans'].fillna(False)]['hour'].value_counts().sort_index(),
-        'place': df[df['contains_place'].fillna(False)]['hour'].value_counts().sort_index(),
-        'people': df[df['contains_people'].fillna(False)]['hour'].value_counts().sort_index(),
-        'other': df_other['hour'].value_counts().sort_index()
-         }
-
-        # Convert to DataFrames
-        hour_counts1 = pd.Series(self.whatsapp_topics['food'], name='Food')
-        hour_counts2 = pd.Series(self.whatsapp_topics['plans'], name='Plans')
-        hour_counts3 = pd.Series(self.whatsapp_topics['place'], name='Places')
-        hour_counts4 = pd.Series(self.whatsapp_topics['people'], name='People')
-        hour_counts5 = pd.Series(self.whatsapp_topics['other'], name='Other')
-
+        'food': df_food['hour'].value_counts().sort_index(),
+        'plans': df_plans['hour'].value_counts().sort_index(),
+        'places': df_places['hour'].value_counts().sort_index(),
+        'people': df_people['hour'].value_counts().sort_index(),
+        'other': df_other['hour'].value_counts().sort_index(),
+        }
         # Create a DataFrame and reindex to ensure all hours are included
         df_counts = pd.DataFrame({
-            'Food': hour_counts1,
-            'Plans': hour_counts2,           
-            'People': hour_counts4,
-            'Places': hour_counts3,
-            'Other': hour_counts5           
+            'Food': pd.Series(self.whatsapp_topics['food'], name='Food'),
+            'Plans': pd.Series(self.whatsapp_topics['plans'], name='Plans'),           
+            'People': pd.Series(self.whatsapp_topics['people'], name='People'),
+            'Places': pd.Series(self.whatsapp_topics['places'], name='Places'),
+            'Other': pd.Series(self.whatsapp_topics['other'], name='Other')           
         }).fillna(0).reindex(range(24), fill_value=0)
-        return df_counts
+
+        # Step 1: Calculate total counts for each hour
+        df_counts['Total'] = df_counts.sum(axis=1)
+
+        # Step 2: Normalize each column (Food, Plans, People, Places, Other) to percentages
+        df_normalized = df_counts.fillna(0).iloc[:, :-1].div(df_counts['Total'], axis=0) * 100
+
+        # Display the normalized DataFrame
+        print(df_normalized)    
+
+        return df_normalized
 
     def transform_data(self):
         """
         Data transformation steps needed for the visualizations
-        """        
-        
+        """               
         self.clean_data()
         # add language column for visualization 1
         self.add_communication_type()

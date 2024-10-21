@@ -3,57 +3,41 @@ import pandas as pd
 
 from wa_visualizer.base_visualization import BaseVisualization
 
-class StackPlotVisualization(BaseVisualization):
+class PlotVisualization(BaseVisualization):
     """Class for stackplots""" 
+    def __init__(self, data, df_normalized : pd.DataFrame):
+        super().__init__(data)
+        self.df_normalized = df_normalized 
 
-    def create_plot(self):
-        """create stackplot 
-        """      
-        # Normalize the data to get percentages
-        total_counts = self.data.sum(axis=1)
-        print("Total counts per hour:", total_counts)
-        
-        # Normalize each column by dividing by the total counts for that hour
-        normalized_data = self.data.div(total_counts, axis=0) * 100
-        
-        # Check normalized data
-        print("Normalized data (%):", normalized_data)
+    def create_plot(self)-> None:
+        """
+        Create distribution
+        """        
+             
+        # Plot the normalized data
+        self.df_normalized.plot(kind='bar', stacked=True, color=[ 'black', 'gray',  'darkgray','salmon',  'lightgray', ], alpha=0.7, figsize=(10, 8),)
 
-        plt.figure(figsize=(12, 6))
-        
-        # Define custom colors
-        colors = ['red', 'gray', 'darkgray', 'lightgray', 'white']
-        
-        # Create the stack plot
-        plt.stackplot(normalized_data.index, normalized_data.T, colors=colors, labels=self.data.columns, alpha=0.6)
-        
-        # Title and labels
-        plt.title("Feeding the Dialogue: How Hunger Fuels Food Conversations")
-        plt.xlabel('Hour of Day')
-        plt.ylabel('Percentage of Messages About Topic (%)')
-        
-        plt.xticks(normalized_data.index, rotation=45)
-        
-        # Add a legend with a title
-        plt.legend(loc='upper left', title='Topics')
-        plt.grid()
+        # Titles and labels
+        plt.title('Are you Coming Home? Late-Night WhatsApp Chats with Teens', fontsize=12)
+        plt.xlabel('Hour of the Day', fontsize=9)
+        plt.ylabel('Percentage of Total Messages', fontsize=12)
+        plt.xticks(rotation=0)
+        plt.legend(title='Topics', fontsize=9)
+
+        # Set more y-ticks
+        #plt.gca().yaxis.set_major_locator(plt.MaxNLocator(20))  # Show up to 10 ticks on y-axis
+        #plt.gca().yaxis.set_major_locator(plt.MultipleLocator(20))  # Set a specific interval for y-ticks (e.g., every 10)
+        # Legend placed outside the plot
+        plt.legend(title='Topics', bbox_to_anchor=(1.00, 1), loc='upper left', fontsize=10)
+        plt.grid(axis='y')
+
+        # Show the plot
+        plt.tight_layout()
+        plt.show()
         
         # Save the plot
         filename = "./img/3_distribution_visualization.png"
         plt.savefig(filename, bbox_inches='tight', transparent=False)
-        plt.close()
+        plt.close('all')
 
-# Example usage
-if __name__ == "__main__":
-    # Sample DataFrame
-    hours = range(24)  # Example for 24 hours
-    df_counts = pd.DataFrame({
-        'Food': [1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7],
-        'Drink': [2, 3, 4, 1, 0, 1, 2, 3, 4, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5],
-        'Snack': [0, 1, 2, 1, 0, 1, 0, 1, 2, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7, 1, 2, 1, 0]
-    }, index=hours)
 
-    # Create the visualization instance
-    visualization = StackPlotVisualization(df_counts)
-    visualization.create_plot()
-    visualization.show()

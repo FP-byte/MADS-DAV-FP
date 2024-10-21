@@ -12,7 +12,7 @@ from wa_visualizer.base_visualization import BaseVisualization
 
 from wa_visualizer.visualization_2 import TimeSeriesVisualization
 from wa_visualizer.visualization_1 import LanguageUsageVisualization
-from wa_visualizer.visualization_3 import StackPlotVisualization
+from wa_visualizer.visualization_3 import PlotVisualization
 from wa_visualizer.visualization_4 import RelationshipsVisualization
 import logging
 
@@ -48,9 +48,9 @@ class Visualizer(Preprocess):
 
     def visualization_week3(self):
        
-        df_counts = self.preprocess_week3()
+        df_counts_normalized = self.preprocess_week3()
         # Create the visualization instance
-        visualization3 = StackPlotVisualization(df_counts)
+        visualization3 = PlotVisualization(self.df, df_counts_normalized)
         visualization3.create_plot()
         visualization3.show()
 
@@ -99,6 +99,6 @@ def main(week, all):
         
 
 if __name__ == "__main__":   
-
-        main(week, all)
+        
+        main("2", all)
 
