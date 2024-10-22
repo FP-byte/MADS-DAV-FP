@@ -58,7 +58,10 @@ class Visualizer(Preprocess):
     def visualization_week4(self):
         df = self.df
         visualization4 = RelationshipsVisualization(df)
-        visualization4.create_plot()
+        df_processed = self.preprocess_week4()
+        #select messages with emoji's
+        df_with_emoji =df_processed[df_processed['has_emoji']]
+        visualization4.create_plot(df_with_emoji)
         visualization4.show()     
 
 @click.command()

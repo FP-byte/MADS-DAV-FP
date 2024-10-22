@@ -3,6 +3,7 @@ from wa_visualizer.base_dataobj import DataObject
 import datetime
 from loguru import logger
 import pandas as pd
+import numpy as np
 
 
 
@@ -85,14 +86,14 @@ class Preprocess(DataObject):
         #delete empty rows
         
         
-    def save_data(self):
+    def save_data(self, datafile):
         """
         save dataframe
         """        
         
         try:
-            self.df.to_csv(self.datafile, index=False)
-            self.df.to_parquet(self.datafile, index=False)
+            self.df.to_csv(datafile, index=False)
+            self.df.to_parquet(datafile, index=False)
         except Exception as e:
             logger.info(f'Problem with saving: {e}')
 
@@ -193,12 +194,12 @@ class Preprocess(DataObject):
 
     def preprocess_week3(self):
         print('prlaceocess week 3')
-        df = self.df
+        df = self.df.copy()
         # Define keywords for each category (selection by hand on the base of frequency and word counts)
         eten_keywords = ['\beten\b', 'eet', "gegeten", 'blijf eten', 'lunch', 'pizza', 'pasta', 'mangia', 'pranzo', 'cena', 'prosciutto', 'kip', 'latte', 'snack', 'indonesisch', 'kapsalon', 'kps', 'delfino', 'ninh', 'bihn']
         plans_keywords = ['vanavond', 'vandaag', 'morgen', 'afspraak', 'domani', 'stasera', 'ochtend']
         place_keywords = ['trein', 'hilversum', 'amsterdam', 'thuis', 'huis', 'ik ben in', 'dallas', 'spanje', 'mexico', 'indonesië', 'hotel', 'onderweg', 'casa']
-        people_keywords = df.author.unique().tolist() + ['papa','mama', 'nonno', 'nonna', 'giacomo', 'opa', 'oma', 'siem', 'tessa', 'ouders']
+        people_keywords = self.df.author.unique().tolist() + ['papa','mama', 'nonno', 'nonna', 'giacomo', 'opa', 'oma', 'siem', 'tessa', 'ouders']
         
         df['hour'] = df['timestamp'].dt.hour
         df.loc[self.contains_keywords(df['message'], eten_keywords), 'topic'] = 'food'
@@ -221,7 +222,12 @@ class Preprocess(DataObject):
         df_people = df[df['topic'] == 'people']
         df_other = df[df['topic'] != 'people']   
 
-        #df_all = pd.concat([df_other, df_food, df_plans, df_places, df_people])
+        df_all = pd.concat([df_other, df_food, df_plans, df_places, df_people])
+        if df_all.shape[0]== self.df.shape[0]:
+            
+            self.df.to_csv("./data/processed/whatsapp-20240916-104455_withtopics.csv", index=False)        
+        else:
+            print('Could not add topics to data')
         #create topics counts
         self.whatsapp_topics = {
         'food': df_food['hour'].value_counts().sort_index(),
@@ -246,9 +252,21 @@ class Preprocess(DataObject):
         df_normalized = df_counts.fillna(0).iloc[:, :-1].div(df_counts['Total'], axis=0) * 100
 
         # Display the normalized DataFrame
-        print(df_normalized)    
+        #print(df_normalized)    
 
         return df_normalized
+
+    def preprocess_week4(self):
+        df = self.df.copy()
+        #include age in the features (cleanup stage)
+        df['year'] = df["timestamp"].apply(lambda x: x.year)       
+        dob_mapping = {'effervescent-camel': 2002, 'nimble-wombat':1971, 'hilarious-goldfinch':1972,
+            'spangled-rabbit':2004}
+        df['dob'] = df['author'].map(dob_mapping)
+        df['age'] = df['year']-df['dob']
+        df.drop(['dob'], inplace=True, axis=1)
+        df["log_len"] = df["message_length"].apply(lambda x: np.log(x))
+        return df
 
     def transform_data(self):
         """
@@ -260,6 +278,6 @@ class Preprocess(DataObject):
         # add date transformation for visualizazion 2
         self.process_dates()
         #save preprocessed data
-        self.save_data()
+        self.save_data(self.datafile)
 
 

@@ -52,9 +52,9 @@ class TimeSeriesVisualization(BaseVisualization):
         # Add title and legend
         plt.title("Digital Silence: The WhatsApp Whisper During Lockdown")
         ax.legend()
-        #filename = "./img/2_timeseries_visualization.png"
-        #plt.savefig(filename, bbox_inches='tight', transparent=False)
-        #plt.close()
+        filename = "./img/2_timeseries_visualization.png"
+        plt.savefig(filename, bbox_inches='tight', transparent=False)
+        plt.close()
 
 # Example usage
 if __name__ == "__main__":

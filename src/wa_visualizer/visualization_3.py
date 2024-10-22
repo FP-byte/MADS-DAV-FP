@@ -33,11 +33,12 @@ class PlotVisualization(BaseVisualization):
 
         # Show the plot
         plt.tight_layout()
-        plt.show()
+        
         
         # Save the plot
         filename = "./img/3_distribution_visualization.png"
         plt.savefig(filename, bbox_inches='tight', transparent=False)
-        plt.close('all')
+        plt.show()
+        plt.close()
 
 
