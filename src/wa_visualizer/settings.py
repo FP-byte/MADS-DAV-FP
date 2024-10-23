@@ -9,7 +9,6 @@ class BaseRegexes:
 
 @dataclass
 class Settings:
-    processed_dir: Path
     img_dir: Path
     time_col: str
     message_col: str
@@ -32,6 +31,7 @@ class Folders:
     raw: Path
     processed: Path
     datafile: Path
+    current: Path
     
 
     

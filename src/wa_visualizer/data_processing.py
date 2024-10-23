@@ -1,5 +1,5 @@
 import re
-
+from pathlib import Path
 import datetime
 from loguru import logger
 import pandas as pd
@@ -201,9 +201,9 @@ class Preprocess(FileHandler):
 
     def prepocess_week2(self, startdate='2019-01-01', enddate='2023-01-01'):
         self.process_dates()          
-        # select data - start period
+        # select dataset for corona time - start period
         start_date = datetime.datetime.strptime(startdate, self.settings.timeformat).date()
-        # end period
+        # end corona period
         end_date = datetime.datetime.strptime(enddate, self.settings.timeformat).date()
         df = self.select_dates(self.data, start_date, end_date)
 
@@ -229,31 +229,31 @@ class Preprocess(FileHandler):
         place_keywords = ['trein', 'hilversum', 'amsterdam', 'thuis', 'huis', 'ik ben in', 'dallas', 'spanje', 'mexico', 'indonesië', 'hotel', 'onderweg', 'casa']
         people_keywords = self.data.author.unique().tolist() + ['papa','mama', 'nonno', 'nonna', 'giacomo', 'opa', 'oma', 'siem', 'tessa', 'ouders']
         
-        df['hour'] = df['timestamp'].dt.hour
-        df.loc[self.contains_keywords(df['message'], eten_keywords), 'topic'] = 'food'
+        df['hour'] = df[self.settings.time_col].dt.hour
+        df.loc[self.contains_keywords(df[self.settings.message_col], eten_keywords), 'topic'] = 'food'
         # Filter DataFrame to remove rows that contain 'food'
         df_food = df[df['topic'] == 'food']
         df  = df[df['topic'] != 'food']
         
         # Filter DataFrame to remove rows that contain 'plans'
-        df.loc[self.contains_keywords(df['message'], plans_keywords), 'topic'] = 'plans'
+        df.loc[self.contains_keywords(df[self.settings.message_col], plans_keywords), 'topic'] = 'plans'
         df_plans = df[df['topic'] == 'plans']
         df = df[df['topic'] != 'plans']
 
         # Filter DataFrame to remove rows that contain 'places'
-        df.loc[self.contains_keywords(df['message'], place_keywords), 'topic'] = 'places'
+        df.loc[self.contains_keywords(df[self.settings.message_col], place_keywords), 'topic'] = 'places'
         df_places = df[df['topic'] == 'places']
         df = df[df['topic'] != 'places']
 
         # Filter DataFrame to remove rows that contain 'people'
-        df.loc[self.contains_keywords(df['message'], people_keywords), 'topic'] = 'people'
+        df.loc[self.contains_keywords(df[self.settings.message_col], people_keywords), 'topic'] = 'people'
         df_people = df[df['topic'] == 'people']
         df_other = df[df['topic'] != 'people']   
 
         df_all = pd.concat([df_other, df_food, df_plans, df_places, df_people])
         if df_all.shape[0]== self.data.shape[0]:
-            
-            self.data.to_csv("./data/processed/whatsapp-20240916-104455_withtopics.csv", index=False)        
+            file_topics = self.folders.processed / Path(self.folders.current).stem
+            self.data.to_csv(f"{file_topics}.csv", index=False)        
         else:
             print('Could not add topics to data')
         #create topics counts
@@ -287,11 +287,11 @@ class Preprocess(FileHandler):
     def preprocess_week4(self):
         df = self.data.copy()
         #include age in the features (cleanup stage)
-        df['year'] = df["timestamp"].apply(lambda x: x.year)
-        df['dob'] = df['author'].map(self.strings.dob_mapping)
+        df['year'] = df[self.settings.time_col].apply(lambda x: x.year)
+        df['dob'] = df[self.settings.author_col].map(self.strings.dob_mapping)
         df['age'] = df['year']-df['dob']
         df.drop(['dob'], inplace=True, axis=1)
-        df["log_len"] = df["message_length"].apply(lambda x: np.log(x))
+        df["log_len"] = df[self.settings.message_length_col].apply(lambda x: np.log(x))
         return df
 
     def process(self):

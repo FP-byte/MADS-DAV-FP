@@ -2,6 +2,7 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from pathlib import Path
 
 class TimeSeriesVisualization():
     #Les 2: Time Series visualization

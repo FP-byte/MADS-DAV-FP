@@ -25,7 +25,6 @@ class Visualizer(Preprocess):
     def __init__(self, folders: Folders, regexes:BaseRegexes, settings:Settings, strings:BaseStrings):
        super().__init__(folders, regexes, settings, strings)
        self.settings = settings
-       print(settings)
     
     def visualization_week1(self):
         processed_data = self.prepocess_week1()
@@ -71,6 +70,7 @@ def main(week, all):
         raw = Path(config["raw"])
         processed = Path(config["processed"])
         datafile = Path(config["input"])
+        current = Path(config["current"])
 
     datafile = (Path(".") / processed / config["current"]).resolve()
 
@@ -80,13 +80,15 @@ def main(week, all):
 
 
         folders = Folders(
-        raw=raw,
-        processed=processed,
-        datafile=datafile)
+        raw = raw,
+        processed = processed,
+        datafile = datafile,
+        current = current,
+        
+        )
 
         settings = Settings(
-        processed_dir = Path('data/processed').resolve(),
-        img_dir = Path('img/').resolve(),
+        img_dir = Path('img/').resolve(),       
         time_col = 'timestamp',
         message_col = 'message',
         author_col = 'author',
