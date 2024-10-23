@@ -1,21 +1,29 @@
 import re
-from wa_visualizer.base_dataobj import DataObject
+
 import datetime
 from loguru import logger
 import pandas as pd
 import numpy as np
+from wa_visualizer.settings import (BaseRegexes, Folders, Settings, BaseStrings)
+from wa_visualizer.base_dataobj import FileHandler
 
-
-
-class Preprocess(DataObject):
+class Preprocess(FileHandler):
     """_summary_
 
     Args:
-        DataObject (_type_): basic data object class
+        FileHandler (class): basic data object class
     """
-    def __init__(self, datafile):
-        super().__init__(datafile)
+    def __init__(self, folders: Folders, regexes:BaseRegexes, settings:Settings, strings :BaseStrings):
+        super().__init__(folders, settings)
+        self.folder = folders
         self.whatsapp_topics={}
+        self.regexes = regexes
+        self.settings = settings
+        self.strings = strings
+    
+    def __call__(self):
+        self.process()
+        self.save_data(self.folder.datafile)
 
     def has_emoji(self, text):
         """
@@ -59,30 +67,28 @@ class Preprocess(DataObject):
             str: cleaned text
         """       
         #removes return and new lines
-        rn_pattern = r'[\r\n?]'
-        text = self.find_replace_pattern(text, rn_pattern)
-        #remove forwarding of changed telephone number
-        pattern_fwd =  r'^\d{2}-\d{2}-\d{4} \d{2}:\d{2} - \+\d{2} \d{2} \d{4} \d{4}: '
-        text = self.find_replace_pattern(text, pattern_fwd)
-        pattern_fwd_tel = r"@\d{10,13}(?:[ ;:,.]|)"
-        text = re.sub(pattern_fwd_tel, '', text)
-        pattern_email =  r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
-        text = re.sub(pattern_email, '', text)
-        username_pattern = r"^@[a-zA-Z0-9._]+"
-        text = re.sub(username_pattern, '', text)
+        for pattern in self.regexes.patters.values():
+            text = self.find_replace_pattern(text, pattern)
+              
+       # text = self.find_replace_pattern(text, self.settings.pattern_fwd)
+       # text = re.sub(self.settings.pattern_fwd_tel, '', text)     
+       # text = re.sub(self.settings.pattern_email, '', text)    
+       # text = re.sub(self.settings.username_pattern, '', text)
         
         return text.strip()
     
     def clean_data(self):
         """
         Data cleaning logic
-        """        
+        """  
+        df = self.data 
+        message = self.settings.message_col     
         # remove returns and new lines
-        self.df['message'] = self.df['message'].appy(self.clean_message)
-        empty_messages = self.df[self.df['message']==""].index
-        self.df.drop(empty_messages, axis=0, inplace=True)
+        df[message] = df[message].appy(self.clean_message)
+        empty_messages = df[df[message]==""].index
+        df.drop(empty_messages, axis=0, inplace=True)
         #rerun emoticon detection for missing emoij's
-        self.df['has_emoji'] =self.df['message'].apply(self.has_emoji)
+        df[self.settings.has_emoji_col] =df[message].apply(self.has_emoji)
         #delete empty rows
         
         
@@ -92,8 +98,8 @@ class Preprocess(DataObject):
         """        
         
         try:
-            self.df.to_csv(datafile, index=False)
-            self.df.to_parquet(datafile, index=False)
+            self.data.to_csv(datafile, index=False)
+            self.data.to_parquet(datafile, index=False)
         except Exception as e:
             logger.info(f'Problem with saving: {e}')
 
@@ -111,10 +117,10 @@ class Preprocess(DataObject):
 
         guessed_language= "NL"
         for word in text:       
-            if word in self.dutch_stopwords+self.dutch_frequentwords:
+            if word in self.strings.dutch_stopwords+self.strings.dutch_frequentwords:
                 guessed_language = "NL"
                         
-            if word in self.italian_stopwords+self.italian_frequentwords:
+            if word in self.strings.italian_stopwords+self.strings.italian_frequentwords:
                 guessed_language = "IT"
         #print(f"guessed_language is {guessed_language}")    
         return guessed_language
@@ -128,26 +134,26 @@ class Preprocess(DataObject):
             str: language category
         """        
 
-        for idx, row in self.df.iterrows():
+        for idx, row in self.data.iterrows():
             text=row.message.replace('\r', "").replace('\n', "").replace('?', "").lower()
             text=text.strip().split(" ") 
             # Check for non-verbal indicators
             if '<Media' in row.message or 'http' in row.message:
-                self.df.at[idx, 'language'] = "Non-verbal"
+                self.data.at[idx, 'language'] = "Non-verbal"
             elif len(text) == 1 and row['has_emoji']:
-                self.df.at[idx, 'language'] = 'Non-verbal'             
+                self.data.at[idx, 'language'] = 'Non-verbal'             
             else:
                 # detect language 
-                self.df.at[idx, 'language'] = self.detect_language(text)
+                self.data.at[idx, 'language'] = self.detect_language(text)
             #  self.df.to_parquet("../data/processed/whatsapp-20240916-104455.parquet")
 
 
     def process_dates(self):
         """add dates information
         """            
-        self.df["date"] = self.df["timestamp"].dt.date
-        self.df["isoweek"] = self.df["timestamp"].dt.isocalendar().week
-        self.df["year-week"] = self.df["timestamp"].dt.strftime("%Y-%W")
+        self.data["date"] = self.data["timestamp"].dt.date
+        self.data["isoweek"] = self.data["timestamp"].dt.isocalendar().week
+        self.data["year-week"] = self.data["timestamp"].dt.strftime("%Y-%W")
        # self.df.to_parquet("../data/processed/whatsapp-20240916-104455.parquet")
 
     
@@ -167,24 +173,46 @@ class Preprocess(DataObject):
         new_index = pd.date_range(start=min_ts, end=max_ts, freq='W', name="year-week").strftime('%Y-%W')
         return p.reindex(new_index, fill_value=0)
     
+    def calculate_percentage(self, counts, total_counts):
+
+        # Calculate percentages
+        return counts.div(total_counts, axis=0) * 100
+
+    def aggregate_languages(self, data):
+        # Grouping by author and language
+        user_language_counts = data.groupby(['author', 'language']).size().unstack(fill_value=0)
+        
+        # Combine 'NL' and 'IT' into 'Verbal'
+        user_language_counts['Verbal'] = user_language_counts[['NL', 'IT']].sum(axis=1)
+
+        # Drop the original NL and IT columns
+        user_language_counts.drop(['NL', 'IT'], inplace=True, axis=1)
+
+        # Calculate the total counts for each author
+        total_counts = user_language_counts.sum(axis=1)
+        return self.calculate_percentage(user_language_counts, total_counts)
+
+    
     def prepocess_week1(self):
         print("processing visual 1")
         self.add_communication_type()
+        return self.aggregate_languages(self.data)
+
 
     def prepocess_week2(self, startdate='2019-01-01', enddate='2023-01-01'):
         self.process_dates()          
         # select data - start period
-        start_date = datetime.datetime.strptime(startdate, "%Y-%m-%d").date()
+        start_date = datetime.datetime.strptime(startdate, self.settings.timeformat).date()
         # end period
-        end_date = datetime.datetime.strptime(enddate, "%Y-%m-%d").date()
-        df = self.select_dates(self.df, start_date, end_date)
+        end_date = datetime.datetime.strptime(enddate, self.settings.timeformat).date()
+        df = self.select_dates(self.data, start_date, end_date)
 
         # select corona data - start first lockdown
-        start_date = datetime.datetime.strptime('2020-03-09', "%Y-%m-%d").date()
+        start_date = datetime.datetime.strptime('2020-03-09', self.settings.timeformat).date()
         # second lockdown
-        end_date = datetime.datetime.strptime('2021-01-15', "%Y-%m-%d").date()
+        end_date = datetime.datetime.strptime('2021-01-15', self.settings.timeformat).date()
 
-        df_corona = self.select_dates(self.df, start_date, end_date)
+        df_corona = self.select_dates(self.data, start_date, end_date)
 
         return df_corona, df
 
@@ -193,13 +221,13 @@ class Preprocess(DataObject):
          return series.str.contains('|'.join(keywords), case=False, regex=True)
 
     def preprocess_week3(self):
-        print('prlaceocess week 3')
-        df = self.df.copy()
+        print('preprocess week 3')
+        df = self.data.copy()
         # Define keywords for each category (selection by hand on the base of frequency and word counts)
         eten_keywords = ['\beten\b', 'eet', "gegeten", 'blijf eten', 'lunch', 'pizza', 'pasta', 'mangia', 'pranzo', 'cena', 'prosciutto', 'kip', 'latte', 'snack', 'indonesisch', 'kapsalon', 'kps', 'delfino', 'ninh', 'bihn']
         plans_keywords = ['vanavond', 'vandaag', 'morgen', 'afspraak', 'domani', 'stasera', 'ochtend']
         place_keywords = ['trein', 'hilversum', 'amsterdam', 'thuis', 'huis', 'ik ben in', 'dallas', 'spanje', 'mexico', 'indonesië', 'hotel', 'onderweg', 'casa']
-        people_keywords = self.df.author.unique().tolist() + ['papa','mama', 'nonno', 'nonna', 'giacomo', 'opa', 'oma', 'siem', 'tessa', 'ouders']
+        people_keywords = self.data.author.unique().tolist() + ['papa','mama', 'nonno', 'nonna', 'giacomo', 'opa', 'oma', 'siem', 'tessa', 'ouders']
         
         df['hour'] = df['timestamp'].dt.hour
         df.loc[self.contains_keywords(df['message'], eten_keywords), 'topic'] = 'food'
@@ -223,9 +251,9 @@ class Preprocess(DataObject):
         df_other = df[df['topic'] != 'people']   
 
         df_all = pd.concat([df_other, df_food, df_plans, df_places, df_people])
-        if df_all.shape[0]== self.df.shape[0]:
+        if df_all.shape[0]== self.data.shape[0]:
             
-            self.df.to_csv("./data/processed/whatsapp-20240916-104455_withtopics.csv", index=False)        
+            self.data.to_csv("./data/processed/whatsapp-20240916-104455_withtopics.csv", index=False)        
         else:
             print('Could not add topics to data')
         #create topics counts
@@ -257,20 +285,18 @@ class Preprocess(DataObject):
         return df_normalized
 
     def preprocess_week4(self):
-        df = self.df.copy()
+        df = self.data.copy()
         #include age in the features (cleanup stage)
-        df['year'] = df["timestamp"].apply(lambda x: x.year)       
-        dob_mapping = {'effervescent-camel': 2002, 'nimble-wombat':1971, 'hilarious-goldfinch':1972,
-            'spangled-rabbit':2004}
-        df['dob'] = df['author'].map(dob_mapping)
+        df['year'] = df["timestamp"].apply(lambda x: x.year)
+        df['dob'] = df['author'].map(self.strings.dob_mapping)
         df['age'] = df['year']-df['dob']
         df.drop(['dob'], inplace=True, axis=1)
         df["log_len"] = df["message_length"].apply(lambda x: np.log(x))
         return df
 
-    def transform_data(self):
+    def process(self):
         """
-        Data transformation steps needed for the visualizations
+        Data transformation steps needed prior the visualizations
         """               
         self.clean_data()
         # add language column for visualization 1
@@ -278,6 +304,6 @@ class Preprocess(DataObject):
         # add date transformation for visualizazion 2
         self.process_dates()
         #save preprocessed data
-        self.save_data(self.datafile)
+        #self.save_data(self.datafile)
 
 

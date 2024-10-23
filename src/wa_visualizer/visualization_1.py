@@ -1,30 +1,23 @@
-from wa_visualizer.base_visualization import BaseVisualization
+
 import seaborn as sns
 import matplotlib.pyplot as plt
+from pathlib import Path
 
-class LanguageUsageVisualization(BaseVisualization):
+class LanguageUsageVisualization():
     # Les 1: comparing categories
 
+    def __init__(self, user_language_percentages, settings):
+        self.user_language_percentages = user_language_percentages  # Initialize with the data for visualization
+        self.settings = settings
+
+    def __call__(self):
+        self.create_plot()
+
     def create_plot(self):
-        # Grouping by author and language
-        user_language_counts = self.data.groupby(['author', 'language']).size().unstack(fill_value=0)
-        
-        # Combine 'NL' and 'IT' into 'Verbal'
-        user_language_counts['Verbal'] = user_language_counts[['NL', 'IT']].sum(axis=1)
-
-        # Drop the original NL and IT columns
-        user_language_counts.drop(['NL', 'IT'], inplace=True, axis=1)
-
-        # Calculate the total counts for each author
-        total_counts = user_language_counts.sum(axis=1)
-
-        # Calculate percentages
-        user_language_percentages = user_language_counts.div(total_counts, axis=0) * 100
-
         # Plotting
-        ax = user_language_percentages.plot(kind='bar', stacked=False, figsize=(12, 8), color=self.colors)
+        ax = self.user_language_percentages.plot(kind='bar', stacked=False, figsize=(12, 8), color=self.settings.custom_colors)
         plt.title("Voices in Numbers: in Whatsapp ")
-        plt.ylabel('Percentage (%)')
+        plt.ylabel('Percentage')
         plt.xlabel('Author')
         plt.xticks(rotation=45)
         plt.legend(title='Communication type')
@@ -35,8 +28,7 @@ class LanguageUsageVisualization(BaseVisualization):
                         (p.get_x() + p.get_width() / 2, p.get_height()), 
                         ha='center', va='bottom', 
                         fontsize=10)
-        filename = "./img/1_categories_visualization.png"
+        filename = self.settings.img_dir / Path("1_categories_visualization.png")
         plt.savefig(filename, bbox_inches='tight', transparent=False)
+        plt.show()
         plt.close()
-        
-

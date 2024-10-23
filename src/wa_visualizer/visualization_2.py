@@ -1,15 +1,17 @@
-from wa_visualizer.base_visualization import BaseVisualization
+
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-class TimeSeriesVisualization(BaseVisualization):
+class TimeSeriesVisualization():
     #Les 2: Time Series visualization
 
-    def __init__(self, p, p_corona):
-        super().__init__(p)
+    def __init__(self, p, p_corona, settings):
         self.p = p
         self.p_corona = p_corona
+
+    def __call__(self):
+        self.create_plot()
 
     def create_plot(self):
         _, ax = plt.subplots(figsize=(12, 6))
@@ -52,8 +54,9 @@ class TimeSeriesVisualization(BaseVisualization):
         # Add title and legend
         plt.title("Digital Silence: The WhatsApp Whisper During Lockdown")
         ax.legend()
-        filename = "./img/2_timeseries_visualization.png"
+        filename = self.settings.img_dir / Path("2_timeseries_visualization.png")
         plt.savefig(filename, bbox_inches='tight', transparent=False)
+        plt.show()
         plt.close()
 
 # Example usage
