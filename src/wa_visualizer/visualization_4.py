@@ -3,11 +3,13 @@ import pandas as pd
 from pathlib import Path
 import seaborn as sns
 import matplotlib.pyplot as plt
+from wa_visualizer.settings import Settings
+
 
 class RelationshipsVisualization():
     #les 4: relationship visualization
 
-    def __init__(self, data, settings):
+    def __init__(self, data: pd.DataFrame, settings:Settings):
         self.settings = settings
         self.df = data
     

@@ -7,7 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import click
 
-from wa_visualizer.data_processing import Preprocess
+from wa_visualizer.data_processing import Preprocessor
 from wa_visualizer.settings import (BaseRegexes, Folders, Settings, BaseStrings)
 from wa_visualizer.base_dataobj import FileHandler
 from wa_visualizer.visualization_1 import LanguageUsageVisualization
@@ -20,27 +20,33 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+class Visualizer():
+    """
+    Manages the visualizations and receives data from the preprocessor.
 
-class Visualizer(Preprocess):
-    def __init__(self, folders: Folders, regexes:BaseRegexes, settings:Settings, strings:BaseStrings):
-       super().__init__(folders, regexes, settings, strings)
-       self.settings = settings
+    Args:
+        Preprocess (class): class for proprocess steps
+    """    
+    def __init__(self, preprocessor :Preprocessor):
+      # super().__init__(folders, regexes, settings, strings)
+       self.settings = preprocessor.settings
+       self.preprocessor = preprocessor
     
     def visualization_week1(self):
-        processed_data = self.prepocess_week1()
+        processed_data = self.preprocessor.prepocess_week1()
         visualization1 = LanguageUsageVisualization(processed_data, self.settings)
         visualization1()
 
     def visualization_week2(self):
-        df_corona, df = self.prepocess_week2()
-        p = self.calc_messages(df)
-        p_corona = self.calc_messages(df_corona)
+        df_corona, df = self.preprocessor.prepocess_week2()
+        p = self.preprocessor.calc_messages(df)
+        p_corona = self.preprocessor.calc_messages(df_corona)
         visualization2 = TimeSeriesVisualization(p, p_corona, self.settings)
         visualization2()        
 
     def visualization_week3(self):
        
-        df_counts_normalized = self.preprocess_week3()
+        df_counts_normalized = self.preprocessor.preprocess_week3()
         self.settings.custom_colors = ["lightgray", 'gray', "#333",'salmon', '#EEE',  '#444']
         # Create the visualization instance
         visualization3 = PlotVisualization(df_counts_normalized, self.settings)
@@ -49,7 +55,7 @@ class Visualizer(Preprocess):
 
     def visualization_week4(self):
         df = self.data
-        df_processed = self.preprocess_week4()
+        df_processed = self.preprocessor.preprocess_week4()
         #select messages with emoji's
         df_with_emoji =df_processed[df_processed['has_emoji']]
         visualization4 = RelationshipsVisualization(df_with_emoji, self.settings)
@@ -114,8 +120,8 @@ def main(week, all):
             dob_mapping = {'effervescent-camel': 2002, 'nimble-wombat':1971, 'hilarious-goldfinch':1972,
                     'spangled-rabbit':2004}
         )
-
-        visualizer = Visualizer(folders, regexes, settings, strings)
+        processor = Preprocessor(folders, regexes, settings, strings)
+        visualizer = Visualizer(processor)
         
 
         if week.lower()=="1" or all:

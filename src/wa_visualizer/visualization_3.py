@@ -1,12 +1,11 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 from pathlib import Path
-
-
+from wa_visualizer.settings import Settings
 
 class PlotVisualization():
     """Class for stackplots""" 
-    def __init__(self, df_normalized : pd.DataFrame, settings):
+    def __init__(self, df_normalized : pd.DataFrame, settings :Settings):
         self.df_normalized = df_normalized
         self.settings = settings
     

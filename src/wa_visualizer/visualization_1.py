@@ -2,11 +2,13 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
 from pathlib import Path
+from wa_visualizer.settings import Settings
+import pandas as pd
 
 class LanguageUsageVisualization():
     # Les 1: comparing categories
 
-    def __init__(self, user_language_percentages, settings):
+    def __init__(self, user_language_percentages:pd.DataFrame, settings:Settings):
         self.user_language_percentages = user_language_percentages  # Initialize with the data for visualization
         self.settings = settings
 

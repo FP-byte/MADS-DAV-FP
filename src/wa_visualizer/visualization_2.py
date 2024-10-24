@@ -3,13 +3,15 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from pathlib import Path
+from wa_visualizer.settings import Settings
 
 class TimeSeriesVisualization():
     #Les 2: Time Series visualization
 
-    def __init__(self, p, p_corona, settings):
+    def __init__(self, p, p_corona, settings :Settings):
         self.p = p
         self.p_corona = p_corona
+        self.settings = settings
 
     def __call__(self):
         self.create_plot()

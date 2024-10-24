@@ -7,7 +7,7 @@ import numpy as np
 from wa_visualizer.settings import (BaseRegexes, Folders, Settings, BaseStrings)
 from wa_visualizer.base_dataobj import FileHandler
 
-class Preprocess(FileHandler):
+class Preprocessor(FileHandler):
     """_summary_
 
     Args:
@@ -16,6 +16,9 @@ class Preprocess(FileHandler):
     def __init__(self, folders: Folders, regexes:BaseRegexes, settings:Settings, strings :BaseStrings):
         super().__init__(folders, settings)
         self.folder = folders
+        self.settings = settings
+        self.regexes = regexes
+        self.strings = strings
         self.whatsapp_topics={}
         self.regexes = regexes
         self.settings = settings
@@ -67,8 +70,9 @@ class Preprocess(FileHandler):
             str: cleaned text
         """       
         #removes return and new lines
-        for pattern in self.regexes.patters.values():
+        for pattern in self.regexes.patterns.values():
             text = self.find_replace_pattern(text, pattern)
+            print(text)
               
        # text = self.find_replace_pattern(text, self.settings.pattern_fwd)
        # text = re.sub(self.settings.pattern_fwd_tel, '', text)     
