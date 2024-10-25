@@ -3,41 +3,39 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from pathlib import Path
-from wa_visualizer.settings import Settings
+from wa_visualizer.settings import Config
+from wa_visualizer.basic_plots import BasicScatterPlot
 
-class TimeSeriesVisualization():
-    #Les 2: Time Series visualization
+class TimeSeriesPlot(BasicScatterPlot):
+    def __init__(self, title: str, ylabel: str, xlabel: str, filename:str, config:Config):
+        super().__init__(self, title, xlabel, ylabel)
+        self.config = config
 
-    def __init__(self, p, p_corona, settings :Settings):
-        self.p = p
-        self.p_corona = p_corona
-        self.settings = settings
+    def __call__(self, p :pd.DataFrame, p_corona:pd.DataFrame, **kwargs):
+        self.create_plot(p, p_corona, **kwargs)
 
-    def __call__(self):
-        self.create_plot()
-
-    def create_plot(self):
+    def create_plot(self, p :pd.DataFrame, p_corona:pd.DataFrame, **kwargs):
         _, ax = plt.subplots(figsize=(12, 6))
 
-        # Scatter plots
-        sns.scatterplot(data=self.p, x=self.p.index, y="timestamp", ax=ax, color='gray')
-        sns.scatterplot(data=self.p_corona, x=self.p_corona.index, y="timestamp", ax=ax)
+        # Scatter plots using Seaborn
+        self.create_plot(p.index, p[self.config.timestamp_col], color='gray', ax=ax)
+        self.create_plot(p_corona.index, p_corona[self.config.timestamp_col], ax=ax)
 
         # Calculate moving averages
-        self.p["moving_avg"] = self.p["timestamp"].rolling(window=1).mean()
-        self.p_corona["moving_avg"] = self.p_corona["timestamp"].rolling(window=1).mean()
+        p["moving_avg"] = p[self.config.timestamp_col].rolling(window=1).mean()
+        p_corona["moving_avg"] = p_corona[self.config.timestamp_col].rolling(window=1).mean()
 
         # Line plots for moving averages
-        sns.lineplot(data=self.p, x=self.p.index, y="moving_avg", ax=ax, color='gray')
-        sns.lineplot(data=self.p_corona, x=self.p_corona.index, y="moving_avg", ax=ax)
+        sns.lineplot(data=p, x=p.index, y="moving_avg", ax=ax, color='gray')
+        sns.lineplot(data=p_corona, x=p_corona.index, y="moving_avg", ax=ax)
 
         # Define the x-coordinates for the vertical lines
         start = '2020-11'  # Start of restrictions
         end = '2021-01'    # End of restrictions
 
         # Add vertical lines
-        ax.axvline(x=start, linestyle='--', label='Start corona-restrictions', color='gray')
-        ax.axvline(x=end, linestyle='--', label='End corona-restrictions', color='gray')
+        ax.axvline(x=start, linestyle='--', label='Start corona-restrictions', color='white')
+        ax.axvline(x=end, linestyle='--', label='End corona-restrictions', color='white')
 
         # Label the vertical lines
         ax.text(start, ax.get_ylim()[1] * 0.9, 'Intelligent lockdown', color='red', 
@@ -50,31 +48,13 @@ class TimeSeriesVisualization():
 
         # Customize x-ticks
         interval = 4
-        xticks = self.p.index[::interval]
+        xticks = p.index[::interval]
         ax.set_xticks(xticks)
         ax.set_xticklabels(xticks, rotation=45, ha='right')
 
-        # Add title and legend
-        plt.title("Digital Silence: The WhatsApp Whisper During Lockdown")
-        ax.legend()
-        filename = self.settings.img_dir / Path("2_timeseries_visualization.png")
+        # Save the plot
+        filename = self.config.img_dir / Path(filename)
         plt.savefig(filename, bbox_inches='tight', transparent=False)
-        plt.show()
+        self.show_plot()
         plt.close()
 
-# Example usage
-if __name__ == "__main__":
-    # Sample data (replace with actual DataFrame)
-    dates = pd.date_range(start='2020-01-01', end='2021-12-31', freq='W')
-    p = pd.DataFrame({
-        'timestamp': [1, 2, 3, 4] * 26,
-    }, index=dates[:104])  # Just for demonstration
-
-    p_corona = pd.DataFrame({
-        'timestamp': [1, 2, 3, 4] * 26,
-    }, index=dates[104:])  # Just for demonstration
-
-    # Create the visualization instance
-    visualization = TimeSeriesVisualization(p, p_corona)
-    visualization.create_plot()
-    visualization.show()

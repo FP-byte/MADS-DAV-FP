@@ -3,14 +3,14 @@ import pandas as pd
 from pathlib import Path
 import seaborn as sns
 import matplotlib.pyplot as plt
-from wa_visualizer.settings import Settings
+from wa_visualizer.settings import Config
 
 
 class RelationshipsVisualization():
     #les 4: relationship visualization
 
-    def __init__(self, data: pd.DataFrame, settings:Settings):
-        self.settings = settings
+    def __init__(self, data: pd.DataFrame, config:Config):
+        self.config = config
         self.df = data
     
     def __call__(self):
@@ -36,7 +36,7 @@ class RelationshipsVisualization():
         plt.tight_layout()
 
         # Save the plot
-        filename = self.settings.img_dir / Path("4_relationships_visualization.png")
+        filename = self.config.img_dir / Path("4_relationships_visualization.png")
         plt.savefig(filename, bbox_inches='tight', transparent=False)
         # Show the plot
         plt.show()        

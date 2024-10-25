@@ -8,9 +8,9 @@ class BaseRegexes:
 
 
 @dataclass
-class Settings:
+class Config:
     img_dir: Path
-    time_col: str
+    timestamp_col: str
     message_col: str
     author_col: str
     message_length_col: str

@@ -4,7 +4,7 @@ import datetime
 from loguru import logger
 import pandas as pd
 import numpy as np
-from wa_visualizer.settings import (BaseRegexes, Folders, Settings, BaseStrings)
+from wa_visualizer.settings import (BaseRegexes, Folders, Config, BaseStrings)
 from wa_visualizer.base_dataobj import FileHandler
 
 class Preprocessor(FileHandler):
@@ -13,15 +13,15 @@ class Preprocessor(FileHandler):
     Args:
         FileHandler (class): basic data object class
     """
-    def __init__(self, folders: Folders, regexes:BaseRegexes, settings:Settings, strings :BaseStrings):
-        super().__init__(folders, settings)
+    def __init__(self, folders: Folders, regexes:BaseRegexes, config:Config, strings :BaseStrings):
+        super().__init__(folders, config)
         self.folder = folders
-        self.settings = settings
+        self.config = config
         self.regexes = regexes
         self.strings = strings
         self.whatsapp_topics={}
         self.regexes = regexes
-        self.settings = settings
+        self.config = config
         self.strings = strings
     
     def __call__(self):
@@ -73,12 +73,7 @@ class Preprocessor(FileHandler):
         for pattern in self.regexes.patterns.values():
             text = self.find_replace_pattern(text, pattern)
             print(text)
-              
-       # text = self.find_replace_pattern(text, self.settings.pattern_fwd)
-       # text = re.sub(self.settings.pattern_fwd_tel, '', text)     
-       # text = re.sub(self.settings.pattern_email, '', text)    
-       # text = re.sub(self.settings.username_pattern, '', text)
-        
+       
         return text.strip()
     
     def clean_data(self):
@@ -86,27 +81,17 @@ class Preprocessor(FileHandler):
         Data cleaning logic
         """  
         df = self.data 
-        message = self.settings.message_col     
+        message = self.config.message_col     
         # remove returns and new lines
         df[message] = df[message].appy(self.clean_message)
         empty_messages = df[df[message]==""].index
         df.drop(empty_messages, axis=0, inplace=True)
         #rerun emoticon detection for missing emoij's
-        df[self.settings.has_emoji_col] =df[message].apply(self.has_emoji)
+        df[self.config.has_emoji_col] =df[message].apply(self.has_emoji)
         #delete empty rows
         
         
-    def save_data(self, datafile):
-        """
-        save dataframe
-        """        
-        
-        try:
-            self.data.to_csv(datafile, index=False)
-            self.data.to_parquet(datafile, index=False)
-        except Exception as e:
-            logger.info(f'Problem with saving: {e}')
-
+    
     
     def detect_language(self, text)-> str:
         """
@@ -155,9 +140,9 @@ class Preprocessor(FileHandler):
     def process_dates(self):
         """add dates information
         """            
-        self.data["date"] = self.data["timestamp"].dt.date
-        self.data["isoweek"] = self.data["timestamp"].dt.isocalendar().week
-        self.data["year-week"] = self.data["timestamp"].dt.strftime("%Y-%W")
+        self.data["date"] = self.data[self.config.timestamp_col].dt.date
+        self.data["isoweek"] = self.data[self.config.timestamp_col].dt.isocalendar().week
+        self.data["year-week"] = self.data[self.config.timestamp_col].dt.strftime("%Y-%W")
        # self.df.to_parquet("../data/processed/whatsapp-20240916-104455.parquet")
 
     
@@ -172,8 +157,8 @@ class Preprocessor(FileHandler):
     
     def calc_messages(self, df):
         p = df.groupby("year-week").count()     #group by the isoweeks
-        min_ts = df["timestamp"].min()
-        max_ts = df["timestamp"].max()
+        min_ts = df[self.config.timestamp_col].min()
+        max_ts = df[self.config.timestamp_col].max()
         new_index = pd.date_range(start=min_ts, end=max_ts, freq='W', name="year-week").strftime('%Y-%W')
         return p.reindex(new_index, fill_value=0)
     
@@ -206,15 +191,15 @@ class Preprocessor(FileHandler):
     def prepocess_week2(self, startdate='2019-01-01', enddate='2023-01-01'):
         self.process_dates()          
         # select dataset for corona time - start period
-        start_date = datetime.datetime.strptime(startdate, self.settings.timeformat).date()
+        start_date = datetime.datetime.strptime(startdate, self.config.timeformat).date()
         # end corona period
-        end_date = datetime.datetime.strptime(enddate, self.settings.timeformat).date()
+        end_date = datetime.datetime.strptime(enddate, self.config.timeformat).date()
         df = self.select_dates(self.data, start_date, end_date)
 
         # select corona data - start first lockdown
-        start_date = datetime.datetime.strptime('2020-03-09', self.settings.timeformat).date()
+        start_date = datetime.datetime.strptime('2020-03-09', self.config.timeformat).date()
         # second lockdown
-        end_date = datetime.datetime.strptime('2021-01-15', self.settings.timeformat).date()
+        end_date = datetime.datetime.strptime('2021-01-15', self.config.timeformat).date()
 
         df_corona = self.select_dates(self.data, start_date, end_date)
 
@@ -233,24 +218,24 @@ class Preprocessor(FileHandler):
         place_keywords = ['trein', 'hilversum', 'amsterdam', 'thuis', 'huis', 'ik ben in', 'dallas', 'spanje', 'mexico', 'indonesië', 'hotel', 'onderweg', 'casa']
         people_keywords = self.data.author.unique().tolist() + ['papa','mama', 'nonno', 'nonna', 'giacomo', 'opa', 'oma', 'siem', 'tessa', 'ouders']
         
-        df['hour'] = df[self.settings.time_col].dt.hour
-        df.loc[self.contains_keywords(df[self.settings.message_col], eten_keywords), 'topic'] = 'food'
+        df['hour'] = df[self.config.timestamp_col].dt.hour
+        df.loc[self.contains_keywords(df[self.config.message_col], eten_keywords), 'topic'] = 'food'
         # Filter DataFrame to remove rows that contain 'food'
         df_food = df[df['topic'] == 'food']
         df  = df[df['topic'] != 'food']
         
         # Filter DataFrame to remove rows that contain 'plans'
-        df.loc[self.contains_keywords(df[self.settings.message_col], plans_keywords), 'topic'] = 'plans'
+        df.loc[self.contains_keywords(df[self.config.message_col], plans_keywords), 'topic'] = 'plans'
         df_plans = df[df['topic'] == 'plans']
         df = df[df['topic'] != 'plans']
 
         # Filter DataFrame to remove rows that contain 'places'
-        df.loc[self.contains_keywords(df[self.settings.message_col], place_keywords), 'topic'] = 'places'
+        df.loc[self.contains_keywords(df[self.config.message_col], place_keywords), 'topic'] = 'places'
         df_places = df[df['topic'] == 'places']
         df = df[df['topic'] != 'places']
 
         # Filter DataFrame to remove rows that contain 'people'
-        df.loc[self.contains_keywords(df[self.settings.message_col], people_keywords), 'topic'] = 'people'
+        df.loc[self.contains_keywords(df[self.config.message_col], people_keywords), 'topic'] = 'people'
         df_people = df[df['topic'] == 'people']
         df_other = df[df['topic'] != 'people']   
 
@@ -291,11 +276,11 @@ class Preprocessor(FileHandler):
     def preprocess_week4(self):
         df = self.data.copy()
         #include age in the features (cleanup stage)
-        df['year'] = df[self.settings.time_col].apply(lambda x: x.year)
-        df['dob'] = df[self.settings.author_col].map(self.strings.dob_mapping)
+        df['year'] = df[self.config.timestamp_col].apply(lambda x: x.year)
+        df['dob'] = df[self.config.author_col].map(self.strings.dob_mapping)
         df['age'] = df['year']-df['dob']
         df.drop(['dob'], inplace=True, axis=1)
-        df["log_len"] = df[self.settings.message_length_col].apply(lambda x: np.log(x))
+        df["log_len"] = df[self.config.message_length_col].apply(lambda x: np.log(x))
         return df
 
     def process(self):

@@ -1,32 +1,28 @@
 import pandas as pd
 from loguru import logger
 from pathlib import Path
-from wa_visualizer.settings import (Settings, Folders)
+from wa_visualizer.settings import (Config, Folders)
 
 class FileHandler():
     data : pd.DataFrame
     datafile: Path
 
-    def __init__(self, folders: Folders, settings: Settings):
+    def __init__(self, folders: Folders, config: Config):
         self.folders = folders
         self.data = self.load_data()
+        self.config = config
 
     def load_data(self):       
         return pd.read_parquet(self.folders.datafile)
 
-    
-#class Regex:
-
-
-"""
-@dataclass
-class Config:
-    input_file: str = "filename.csv"
-    timestamp_format: str = ""
-    outputfile: str 
-
-class FileHandler:
-    def __init__(slef, config: Config):
-        self.config = config
-
-    def load_csv()"""
+    def save_data(self, datafile) -> None:
+        """
+        save dataframe
+        """        
+        
+        try:
+            self.data.to_csv(self.config.output_file, index=False)
+            self.data.to_parquet(self.config.output_file, index=False)
+            print(f"Data processing completed and saved to '{self.config.output_file}'")
+        except Exception as e:
+            logger.info(f'Problem with saving: {e}')

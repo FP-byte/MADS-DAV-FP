@@ -8,17 +8,18 @@ import matplotlib.pyplot as plt
 import click
 
 from wa_visualizer.data_processing import Preprocessor
-from wa_visualizer.settings import (BaseRegexes, Folders, Settings, BaseStrings)
+from wa_visualizer.settings import (BaseRegexes, Folders, Config, BaseStrings)
 from wa_visualizer.base_dataobj import FileHandler
-from wa_visualizer.visualization_1 import LanguageUsageVisualization
-from wa_visualizer.visualization_2 import TimeSeriesVisualization
+from wa_visualizer.visualization_1 import LanguageUsagePlot
+from wa_visualizer.visualization_2 import TimeSeriesPlot
 from wa_visualizer.visualization_3 import PlotVisualization
 from wa_visualizer.visualization_4 import RelationshipsVisualization
-import logging
+#import logging
+from loguru import logger
 
 # Set up the logger
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+#logging.basicConfig(level=logging.INFO)
+#logger = logging.getLogger(__name__)
 
 class Visualizer():
     """
@@ -28,28 +29,38 @@ class Visualizer():
         Preprocess (class): class for proprocess steps
     """    
     def __init__(self, preprocessor :Preprocessor):
-      # super().__init__(folders, regexes, settings, strings)
-       self.settings = preprocessor.settings
+      # super().__init__(folders, regexes, config, strings)
+       self.config = preprocessor.config
        self.preprocessor = preprocessor
     
     def visualization_week1(self):
         processed_data = self.preprocessor.prepocess_week1()
-        visualization1 = LanguageUsageVisualization(processed_data, self.settings)
-        visualization1()
+        plot1 = LanguageUsagePlot(title="Voices in Numbers: in Whatsapp",
+                                  ylabel="Percentage",
+                                  xlabel="Author",
+                                  filename= "1_categories_visualization.png",
+                                  config=self.config)
+        plot1(processed_data)
 
     def visualization_week2(self):
         df_corona, df = self.preprocessor.prepocess_week2()
         p = self.preprocessor.calc_messages(df)
         p_corona = self.preprocessor.calc_messages(df_corona)
-        visualization2 = TimeSeriesVisualization(p, p_corona, self.settings)
-        visualization2()        
+        visualization2 = TimeSeriesPlot(
+                         title="Digital Silence: The WhatsApp Whisper During Lockdown",
+                         xlabel="Date",
+                         ylabel="Timestamp",
+                         filename = "2_timeseries_visualization.png",
+                         config=self.config
+                         )
+        visualization2(p, p_corona)        
 
     def visualization_week3(self):
        
         df_counts_normalized = self.preprocessor.preprocess_week3()
-        self.settings.custom_colors = ["lightgray", 'gray', "#333",'salmon', '#EEE',  '#444']
+        self.config.custom_colors = ["lightgray", 'gray', "#333",'salmon', '#EEE',  '#444']
         # Create the visualization instance
-        visualization3 = PlotVisualization(df_counts_normalized, self.settings)
+        visualization3 = PlotVisualization(df_counts_normalized, self.config)
         visualization3()
 
 
@@ -58,7 +69,7 @@ class Visualizer():
         df_processed = self.preprocessor.preprocess_week4()
         #select messages with emoji's
         df_with_emoji =df_processed[df_processed['has_emoji']]
-        visualization4 = RelationshipsVisualization(df_with_emoji, self.settings)
+        visualization4 = RelationshipsVisualization(df_with_emoji, self.config)
         visualization4()     
 
 @click.command()
@@ -93,9 +104,9 @@ def main(week, all):
         
         )
 
-        settings = Settings(
+        config = Config(
         img_dir = Path('img/').resolve(),       
-        time_col = 'timestamp',
+        timestamp_col = 'timestamp',
         message_col = 'message',
         author_col = 'author',
         has_emoji_col= 'has_emoji',
@@ -120,7 +131,7 @@ def main(week, all):
             dob_mapping = {'effervescent-camel': 2002, 'nimble-wombat':1971, 'hilarious-goldfinch':1972,
                     'spangled-rabbit':2004}
         )
-        processor = Preprocessor(folders, regexes, settings, strings)
+        processor = Preprocessor(folders, regexes, config, strings)
         visualizer = Visualizer(processor)
         
 

@@ -1,13 +1,13 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 from pathlib import Path
-from wa_visualizer.settings import Settings
+from wa_visualizer.settings import Config
 
 class PlotVisualization():
     """Class for stackplots""" 
-    def __init__(self, df_normalized : pd.DataFrame, settings :Settings):
+    def __init__(self, df_normalized : pd.DataFrame, config :Config):
         self.df_normalized = df_normalized
-        self.settings = settings
+        self.config = config
     
     def __call__(self):
         self.create_plot()
@@ -17,7 +17,7 @@ class PlotVisualization():
         Create distribution
         """           
         # Plot the normalized data
-        self.df_normalized.plot(kind='bar', stacked=True, color=self.settings.custom_colors, alpha=0.7, figsize=(10, 8),)
+        self.df_normalized.plot(kind='bar', stacked=True, color=self.config.custom_colors, alpha=0.7, figsize=(10, 8),)
 
         # Titles and labels
         plt.title('Are you Coming Home? Late-Night WhatsApp Chats with Teens', fontsize=12)
@@ -35,7 +35,7 @@ class PlotVisualization():
         
         
         # Save the plot
-        filename = self.settings.img_dir / Path("2_timeseries_visualization.png")
+        filename = self.config.img_dir / Path("2_timeseries_visualization.png")
         plt.savefig(filename, bbox_inches='tight', transparent=False)
         plt.show()
         plt.close()
