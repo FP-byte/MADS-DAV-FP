@@ -11,9 +11,9 @@ import numpy as np
 from wa_visualizer.data_processing import Preprocessor
 from wa_visualizer.settings import (BaseRegexes, Folders, Config, BaseStrings)
 from wa_visualizer.base_dataobj import FileHandler
-from wa_visualizer.basic_plots import BarPlot
-from wa_visualizer.visualization_2 import TimeSeriesPlot
-from wa_visualizer.visualization_4 import RelationshipsVisualization
+from wa_visualizer.bar_plot import BarPlot
+from wa_visualizer.timeseries_plot import TimeSeriesPlot
+from wa_visualizer.relationships_plot import RelationshipsPlot
 #import logging
 from loguru import logger
 
@@ -35,7 +35,7 @@ class Visualizer():
     
     def visualization_week1(self):
         processed_data = self.preprocessor.prepocess_week1()
-        plot1 = BarPlot(title="Voices in Numbers: in Whatsapp",
+        plot1 = BarPlot(title_fig="A Picture Isn't Worth a Thousand Words",
                                   ylabel="Percentage",
                                   xlabel="Author",
                                   filename= "1_categories_visualization.png",
@@ -48,7 +48,7 @@ class Visualizer():
         p = self.preprocessor.calc_messages(df)
         p_corona = self.preprocessor.calc_messages(df_corona)
         visualization2 = TimeSeriesPlot(
-                         title="Digital Silence: The WhatsApp Whisper During Lockdown",
+                         title_fig="Digital Silence: The WhatsApp Whisper During Lockdown",
                          xlabel="Date: year-week",
                          ylabel="Number of messages",
                          filename = "2_timeseries_visualization.png",
@@ -62,35 +62,30 @@ class Visualizer():
         df_counts_normalized = self.preprocessor.preprocess_week3()
         self.config.custom_colors = ["lightgray", 'gray', "#333",'salmon', '#EEE',  '#444']
         # Create the visualization instance
-        plot3 = BarPlot(title='Are you Coming Home? Late-Night WhatsApp Chats with Teens',
+        plot3 = BarPlot(title_fig='Are you Coming Home? Late-Night WhatsApp Chats with Teens',
                                   ylabel='Percentage of Total Messages',
                                   xlabel='Hour of the Day',
                                   filename= "3_categories_visualization.png",
-                                  config=self.config)
+                                  config=self.config,
+                                  legend_title = 'Topics')
         plot3(df_counts_normalized, True)
-
+    
     def visualization_week4(self):
-        avg_log_length_withemoji, avg_log_length_withoutemoji = self.preprocessor.preprocess_week4()
+        #avg_log_length_withemoji, avg_log_length_withoutemoji = self.preprocessor.preprocess_week4()
+        avg_log_df = self.preprocessor.preprocess_week4()
+        print(avg_log_df)
 
-        plot4 = RelationshipsVisualization(
-            config = self.config,
-            title="Getting Slower Fingers with Age: Adults Save Typing Time with Emojis",
+        #Create the plot
+        plot = RelationshipsPlot(
+            config=self.config,
+            title_fig="Getting Slower Fingers with Age - Adults Save Typing Time with Emojis",
             xlabel='Author Age',
-            ylabel='Average Log of Message Length Containing Emojis',
-            filename= '4_relationships_visualization.png'
-        )
-        # Plot regression line for average log length against age
-        plot4(avg_log_length_withemoji, 'age', 'log_len') 
+            ylabel='Average Log of Message Length',
+            filename='4_relationships_visualization.png')
 
-        plot5 = RelationshipsVisualization(
-            config = self.config,
-            title="Getting Slower Fingers with Age: Adults Save Typing Time with Emojis",
-            xlabel='Author Age',
-            ylabel='Average Log of Message Length Containing Emojis',
-            filename= '4_relationships_visualization2.png'
-        )
-        # Plot regression line for average log length against age
-        plot5(avg_log_length_withoutemoji, 'age', 'log_len')     
+        # Call the plot
+        plot(avg_log_df, 'age', 'log_len', scatter_size=60)
+
 
 @click.command()
 @click.option("--week", default="1", help="Week number: input 1 to 7")

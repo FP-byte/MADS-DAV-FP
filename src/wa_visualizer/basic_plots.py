@@ -7,25 +7,26 @@ from loguru import logger
 import seaborn as sns
 
 class BasicPlot:
-    def __init__(self, config: Config, title: str, xlabel: str, ylabel: str, filename: str, figsize=(12, 8), show_legend: bool = True):
+    def __init__(self, config: Config, title_fig: str, xlabel: str, ylabel: str, filename: str, figsize=(12, 8), show_legend: bool = True, legend_title:str=""):
         self.config = config
-        self.title = title
+        self.title_fig = title_fig
         self.xlabel = xlabel
         self.ylabel = ylabel
         self.filename = filename
         self.show_legend = show_legend
+        self.legend_title = legend_title
     
     def plot(self, data: pd.DataFrame):
         #to define for each plot
         pass
 
     def show_plot(self):
-        plt.title(self.title)
+        plt.title(self.title_fig)
         plt.xlabel(self.xlabel)
         plt.ylabel(self.ylabel)
         plt.tight_layout()
         if self.show_legend:
-            plt.legend()
+            plt.legend(title=self.legend_title, bbox_to_anchor=(1.0, 1), loc='upper left')
         plt.show()
 
     def save(self):
@@ -34,8 +35,8 @@ class BasicPlot:
         plt.close()  # Close the figure to free up memory
 
 class BasicScatterPlot(BasicPlot):
-    def __init__(self, config: Config, title: str, xlabel: str, ylabel: str, filename: str, show_legend: bool = True):
-        super().__init__(config, title, xlabel, ylabel, filename, show_legend)
+    def __init__(self, config: Config, title_fig: str, xlabel: str, ylabel: str, filename: str, show_legend: bool = True):
+        super().__init__(config, title_fig, xlabel, ylabel, filename, show_legend)
 
     def plot(self, x, y, **kwargs):
         """Create a scatter plot with optional additional parameters."""
@@ -47,38 +48,19 @@ class BasicScatterPlot(BasicPlot):
         moving_avg_plot = MovingAverageLinePlot(data, self.config.timestamp_col, color=color)       
         moving_avg_plot(ax)
 
-class BarPlot(BasicPlot):
-    def __init__(self, config: Config, title: str, ylabel: str, xlabel: str, filename: str, legend_title: str = ""):
-        super().__init__(config, title, xlabel, ylabel, filename)
-        self.legend_title = legend_title
+# class RegPlot(BasicPlot):
+#     def __init__(self, config: Config, title_fig: str, xlabel: str, ylabel: str, filename: str, figsize=(20, 10), show_legend: bool = True):
+#         super().__init__(config, title_fig, xlabel, ylabel, filename, show_legend)
 
-    def __call__(self, data, stacked: bool):
-        self.plot(data, stacked)
-        self.show_plot()
-        self.save()
+#     def __call__(self, data: pd.DataFrame, x: str, y: str, **kwargs):
+#         self.plot(data, x, y, **kwargs)
+#         self.show_plot()
+#         self.save()
 
-    def plot(self, data: pd.DataFrame, stacked: bool = False):
-        # Plotting
-        ax = data.plot(kind='bar', stacked=stacked, figsize=(12, 8), color=self.config.custom_colors)
-        plt.title(self.title)
-        plt.ylabel(self.ylabel)
-        plt.xlabel(self.xlabel)
-        plt.xticks(rotation=45)
-        plt.legend(title=self.legend_title, bbox_to_anchor=(1.00, 1), loc='upper left')
-
-class RegPlot(BasicPlot):
-    def __init__(self, config: Config, title: str, xlabel: str, ylabel: str, filename: str, figsize=(20, 10), show_legend: bool = True):
-        super().__init__(config, title, xlabel, ylabel, filename, show_legend)
-
-    def __call__(self, data: pd.DataFrame, x: str, y: str, **kwargs):
-        self.plot(data, x, y, **kwargs)
-        self.show_plot()
-        self.save()
-
-    def plot(self, data: pd.DataFrame, x: str, y: str, scatter_size: int, color: str, label: str = None):
-        """Create a regression plot."""
-        sns.regplot(data=data, x=x, y=y, marker='o', scatter_kws={'s': scatter_size}, color=color, label=label)
-        plt.grid()
+#     def plot(self, x: str, y: str, scatter_size: int, label: str = None):
+#         """Create a regression plot."""
+#         sns.regplot( x=x, y=y, marker='o', scatter_kws={'s': scatter_size}, label=label)
+#         plt.grid()
 
 
 class VerticalLine:

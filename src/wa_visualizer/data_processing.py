@@ -89,9 +89,7 @@ class Preprocessor(FileHandler):
         #rerun emoticon detection for missing emoij's
         df[self.config.has_emoji_col] =df[message].apply(self.has_emoji)
         #delete empty rows
-        
-        
-    
+
     
     def detect_language(self, text)-> str:
         """
@@ -163,14 +161,13 @@ class Preprocessor(FileHandler):
         return p.reindex(new_index, fill_value=0)
     
     def calculate_percentage(self, counts, total_counts):
-
         # Calculate percentages
-        return counts.div(total_counts, axis=0) * 100
+        return (counts.div(total_counts, axis=0) * 100)
 
     def aggregate_languages(self, data):
         # Grouping by author and language
         user_language_counts = data.groupby(['author', 'language']).size().unstack(fill_value=0)
-        
+
         # Combine 'NL' and 'IT' into 'Verbal'
         user_language_counts['Verbal'] = user_language_counts[['NL', 'IT']].sum(axis=1)
 
@@ -179,8 +176,14 @@ class Preprocessor(FileHandler):
 
         # Calculate the total counts for each author
         total_counts = user_language_counts.sum(axis=1)
-        return self.calculate_percentage(user_language_counts, total_counts)
 
+        # Sort user_language_counts based on the sorted language counts
+        sorted_user_language_counts = user_language_counts.sort_values(by='Verbal', ascending=False)  # Sort by Verbal column
+        print(sorted_user_language_counts)
+        percentages = self.calculate_percentage(sorted_user_language_counts, total_counts)
+        percentages_sorted = percentages.sort_values(by='Verbal', ascending=False)
+
+        return percentages_sorted
     
     def prepocess_week1(self):
         print("processing visual 1")
@@ -275,19 +278,23 @@ class Preprocessor(FileHandler):
 
     def preprocess_week4(self):
         df = self.data.copy()
-        #include age in the features (cleanup stage)
-        df['year'] = df[self.config.timestamp_col].apply(lambda x: x.year)
+        
+        # Include age in the features (cleanup stage)
+        df['year'] = df[self.config.timestamp_col].dt.year  # Extract year from datetime
         df['dob'] = df[self.config.author_col].map(self.strings.dob_mapping)
-        df['age'] = df['year']-df['dob']
+        df['age'] = df['year'] - df['dob']
         df.drop(['dob'], inplace=True, axis=1)
-        df["log_len"] = df[self.config.message_length_col].apply(lambda x: np.log(x))
-        #select messages with emoji's
-        df_with_emoji =df[df[self.config.has_emoji_col]]
+
         # Calculate the logarithm of message length
-        df_without_emoji = df[df[self.config.has_emoji_col]==False]
-        avg_log_length_withemoji = df_with_emoji.groupby('age')['log_len'].mean().reset_index()
-        avg_log_length_withoutemoji = df_without_emoji.groupby('age')['log_len'].mean().reset_index()
-        return avg_log_length_withemoji, avg_log_length_withoutemoji
+        df["log_len"] = df[self.config.message_length_col].apply(lambda x: np.log(x) if x > 0 else 0)  # Handle log(0)
+
+        # Create a new column to categorize messages based on emoji presence
+        df['emoji_status'] = df['has_emoji'].apply(lambda x: 'With Emoji' if x > 0 else 'Without Emoji')
+
+        # Calculate the average log length per age
+        avg_log_df = df.groupby(['age', 'emoji_status'])['log_len'].mean().reset_index()
+    
+        return avg_log_df
 
     def process(self):
         """
