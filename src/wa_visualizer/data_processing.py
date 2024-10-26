@@ -281,7 +281,13 @@ class Preprocessor(FileHandler):
         df['age'] = df['year']-df['dob']
         df.drop(['dob'], inplace=True, axis=1)
         df["log_len"] = df[self.config.message_length_col].apply(lambda x: np.log(x))
-        return df
+        #select messages with emoji's
+        df_with_emoji =df[df[self.config.has_emoji_col]]
+        # Calculate the logarithm of message length
+        df_without_emoji = df[df[self.config.has_emoji_col]==False]
+        avg_log_length_withemoji = df_with_emoji.groupby('age')['log_len'].mean().reset_index()
+        avg_log_length_withoutemoji = df_without_emoji.groupby('age')['log_len'].mean().reset_index()
+        return avg_log_length_withemoji, avg_log_length_withoutemoji
 
     def process(self):
         """

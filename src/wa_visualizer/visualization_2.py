@@ -33,22 +33,15 @@ class TimeSeriesPlot(BasicScatterPlot):
         #define plot for corona time
         self.plot(p_corona.index, p_corona[self.config.timestamp_col], ax=ax, color = self.color_highlight)
 
-        # Create moving average line plots
-        moving_avg_plot_p = MovingAverageLinePlot(p, self.config.timestamp_col, color= self.color)
-        #define plot for corona time
-        moving_avg_plot_corona = MovingAverageLinePlot(p_corona, self.config.timestamp_col, color= self.color_highlight)
-        
-        moving_avg_plot_p.draw(ax)
-        moving_avg_plot_corona.draw(ax)
-        start = '2020-11'  # Start of restrictions
-        end = '2021-01'    # End of restrictions
+        moving_avg_plot_p = self.plot_moving_average(p, self.config.timestamp_col, 7, ax, color = self.color)
+        moving_avg_plot_corona = self.plot_moving_average(p_corona, self.config.timestamp_col, 7, ax, color = self.color_highlight)
 
         # Define and draw vertical lines
         vertical_line_start = VerticalLine('2020-13', 'Start Intelligent lockdown', self.color_vertical_line, 'right')
         vertical_line_end = VerticalLine('2021-01', 'End Christmas lockdown', self.color_vertical_line, 'left')
 
-        vertical_line_start.draw(ax)
-        vertical_line_end.draw(ax)
+        vertical_line_start(ax)
+        vertical_line_end(ax)
 
         # Highlight the area between the two vertical lines
         ax.axvspan(vertical_line_start.x, vertical_line_end.x, color=self.color, alpha=0.1)     

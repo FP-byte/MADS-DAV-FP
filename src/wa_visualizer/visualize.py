@@ -6,6 +6,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import click
+import numpy as np
 
 from wa_visualizer.data_processing import Preprocessor
 from wa_visualizer.settings import (BaseRegexes, Folders, Config, BaseStrings)
@@ -69,12 +70,27 @@ class Visualizer():
         plot3(df_counts_normalized, True)
 
     def visualization_week4(self):
-        df = self.data
-        df_processed = self.preprocessor.preprocess_week4()
-        #select messages with emoji's
-        df_with_emoji =df_processed[df_processed['has_emoji']]
-        visualization4 = RelationshipsVisualization(df_with_emoji, self.config)
-        visualization4()     
+        avg_log_length_withemoji, avg_log_length_withoutemoji = self.preprocessor.preprocess_week4()
+
+        plot4 = RelationshipsVisualization(
+            config = self.config,
+            title="Getting Slower Fingers with Age: Adults Save Typing Time with Emojis",
+            xlabel='Author Age',
+            ylabel='Average Log of Message Length Containing Emojis',
+            filename= '4_relationships_visualization.png'
+        )
+        # Plot regression line for average log length against age
+        plot4(avg_log_length_withemoji, 'age', 'log_len') 
+
+        plot5 = RelationshipsVisualization(
+            config = self.config,
+            title="Getting Slower Fingers with Age: Adults Save Typing Time with Emojis",
+            xlabel='Author Age',
+            ylabel='Average Log of Message Length Containing Emojis',
+            filename= '4_relationships_visualization2.png'
+        )
+        # Plot regression line for average log length against age
+        plot5(avg_log_length_withoutemoji, 'age', 'log_len')     
 
 @click.command()
 @click.option("--week", default="1", help="Week number: input 1 to 7")
