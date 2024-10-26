@@ -40,10 +40,12 @@ class TimeSeriesPlot(BasicScatterPlot):
         
         moving_avg_plot_p.draw(ax)
         moving_avg_plot_corona.draw(ax)
+        start = '2020-11'  # Start of restrictions
+        end = '2021-01'    # End of restrictions
 
         # Define and draw vertical lines
-        vertical_line_start = VerticalLine('2020-13', 'Start corona-restrictions', self.color_vertical_line, 'right')
-        vertical_line_end = VerticalLine('2021-01', 'End corona-restrictions', self.color_vertical_line, 'left')
+        vertical_line_start = VerticalLine('2020-13', 'Start Intelligent lockdown', self.color_vertical_line, 'right')
+        vertical_line_end = VerticalLine('2021-01', 'End Christmas lockdown', self.color_vertical_line, 'left')
 
         vertical_line_start.draw(ax)
         vertical_line_end.draw(ax)

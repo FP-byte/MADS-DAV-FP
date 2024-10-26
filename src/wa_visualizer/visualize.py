@@ -10,9 +10,8 @@ import click
 from wa_visualizer.data_processing import Preprocessor
 from wa_visualizer.settings import (BaseRegexes, Folders, Config, BaseStrings)
 from wa_visualizer.base_dataobj import FileHandler
-from wa_visualizer.visualization_1 import LanguageUsagePlot
+from wa_visualizer.basic_plots import BarPlot
 from wa_visualizer.visualization_2 import TimeSeriesPlot
-from wa_visualizer.visualization_3 import PlotVisualization
 from wa_visualizer.visualization_4 import RelationshipsVisualization
 #import logging
 from loguru import logger
@@ -35,12 +34,13 @@ class Visualizer():
     
     def visualization_week1(self):
         processed_data = self.preprocessor.prepocess_week1()
-        plot1 = LanguageUsagePlot(title="Voices in Numbers: in Whatsapp",
+        plot1 = BarPlot(title="Voices in Numbers: in Whatsapp",
                                   ylabel="Percentage",
                                   xlabel="Author",
                                   filename= "1_categories_visualization.png",
                                   config=self.config)
-        plot1(processed_data)
+        plot1(processed_data, False)
+
 
     def visualization_week2(self):
         df_corona, df = self.preprocessor.prepocess_week2()
@@ -61,9 +61,12 @@ class Visualizer():
         df_counts_normalized = self.preprocessor.preprocess_week3()
         self.config.custom_colors = ["lightgray", 'gray', "#333",'salmon', '#EEE',  '#444']
         # Create the visualization instance
-        visualization3 = PlotVisualization(df_counts_normalized, self.config)
-        visualization3()
-
+        plot3 = BarPlot(title='Are you Coming Home? Late-Night WhatsApp Chats with Teens',
+                                  ylabel='Percentage of Total Messages',
+                                  xlabel='Hour of the Day',
+                                  filename= "3_categories_visualization.png",
+                                  config=self.config)
+        plot3(df_counts_normalized, True)
 
     def visualization_week4(self):
         df = self.data
@@ -95,14 +98,11 @@ def main(week, all):
     if not datafile.exists():
         logger.warning("Datafile does not exist.")
     else:
-
-
         folders = Folders(
         raw = raw,
         processed = processed,
         datafile = datafile,
-        current = current,
-        
+        current = current,       
         )
 
         config = Config(
