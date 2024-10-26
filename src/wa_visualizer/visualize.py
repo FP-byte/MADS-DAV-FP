@@ -12,8 +12,8 @@ from wa_visualizer.data_processing import Preprocessor
 from wa_visualizer.settings import (BaseRegexes, Folders, Config, BaseStrings)
 from wa_visualizer.base_dataobj import FileHandler
 from wa_visualizer.bar_plot import BarPlot
-from wa_visualizer.timeseries_plot import TimeSeriesPlot
-from wa_visualizer.relationships_plot import RelationshipsPlot
+from wa_visualizer.time_scatter_plot import TimeSeriesPlot
+from wa_visualizer.facegrid_regplot import RelationshipsPlot
 #import logging
 from loguru import logger
 
@@ -41,7 +41,6 @@ class Visualizer():
                                   filename= "1_categories_visualization.png",
                                   config=self.config)
         plot1(processed_data, False)
-
 
     def visualization_week2(self):
         df_corona, df = self.preprocessor.prepocess_week2()
@@ -73,12 +72,11 @@ class Visualizer():
     def visualization_week4(self):
         #avg_log_length_withemoji, avg_log_length_withoutemoji = self.preprocessor.preprocess_week4()
         avg_log_df = self.preprocessor.preprocess_week4()
-        print(avg_log_df)
 
         #Create the plot
         plot = RelationshipsPlot(
             config=self.config,
-            title_fig="Getting Slower Fingers with Age - Adults Save Typing Time with Emojis",
+            title_fig="Getting Slower Fingers with Age: Adults Save (Typing) Time with Emoji's",
             xlabel='Author Age',
             ylabel='Average Log of Message Length',
             filename='4_relationships_visualization.png')

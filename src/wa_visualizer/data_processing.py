@@ -8,7 +8,8 @@ from wa_visualizer.settings import (BaseRegexes, Folders, Config, BaseStrings)
 from wa_visualizer.base_dataobj import FileHandler
 
 class Preprocessor(FileHandler):
-    """_summary_
+    """
+    Manages all the preprocessing steps for the visualizations
 
     Args:
         FileHandler (class): basic data object class
@@ -132,8 +133,6 @@ class Preprocessor(FileHandler):
             else:
                 # detect language 
                 self.data.at[idx, 'language'] = self.detect_language(text)
-            #  self.df.to_parquet("../data/processed/whatsapp-20240916-104455.parquet")
-
 
     def process_dates(self):
         """add dates information
@@ -141,8 +140,6 @@ class Preprocessor(FileHandler):
         self.data["date"] = self.data[self.config.timestamp_col].dt.date
         self.data["isoweek"] = self.data[self.config.timestamp_col].dt.isocalendar().week
         self.data["year-week"] = self.data[self.config.timestamp_col].dt.strftime("%Y-%W")
-       # self.df.to_parquet("../data/processed/whatsapp-20240916-104455.parquet")
-
     
     def select_dates(self, df, start_date, end_date):
         if 'date' in df:
@@ -179,7 +176,6 @@ class Preprocessor(FileHandler):
 
         # Sort user_language_counts based on the sorted language counts
         sorted_user_language_counts = user_language_counts.sort_values(by='Verbal', ascending=False)  # Sort by Verbal column
-        print(sorted_user_language_counts)
         percentages = self.calculate_percentage(sorted_user_language_counts, total_counts)
         percentages_sorted = percentages.sort_values(by='Verbal', ascending=False)
 

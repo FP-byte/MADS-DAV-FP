@@ -12,8 +12,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 class TimeSeriesPlot(BasicScatterPlot):
-    def __init__(self, title: str, ylabel: str, xlabel: str, filename: str, config: Config, show_legend: bool = True):
-        super().__init__(config, title, xlabel, ylabel, show_legend)  # Pass show_legend to the superclass
+    def __init__(self, title_fig: str, ylabel: str, xlabel: str, filename: str, config: Config, show_legend: bool = True):
+        super().__init__(config, title_fig, xlabel, ylabel, show_legend)  # Pass show_legend to the superclass
         self.filename = filename
         self.show_legend = show_legend
         #define custom colors for this plot

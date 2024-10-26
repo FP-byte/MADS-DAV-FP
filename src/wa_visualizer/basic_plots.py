@@ -48,32 +48,20 @@ class BasicScatterPlot(BasicPlot):
         moving_avg_plot = MovingAverageLinePlot(data, self.config.timestamp_col, color=color)       
         moving_avg_plot(ax)
 
-# class RegPlot(BasicPlot):
-#     def __init__(self, config: Config, title_fig: str, xlabel: str, ylabel: str, filename: str, figsize=(20, 10), show_legend: bool = True):
-#         super().__init__(config, title_fig, xlabel, ylabel, filename, show_legend)
-
-#     def __call__(self, data: pd.DataFrame, x: str, y: str, **kwargs):
-#         self.plot(data, x, y, **kwargs)
-#         self.show_plot()
-#         self.save()
-
-#     def plot(self, x: str, y: str, scatter_size: int, label: str = None):
-#         """Create a regression plot."""
-#         sns.regplot( x=x, y=y, marker='o', scatter_kws={'s': scatter_size}, label=label)
-#         plt.grid()
-
-
 class VerticalLine:
+    """
+    Adds a vertical line in a plot, given coordinates
+    """    
     def __init__(self, x: str, label: str, color: str = 'white', horizontalalignment_text='center' ):
         self.x = x
         self.label = label
         self.color = color
         self.horizontalalignment_text=horizontalalignment_text 
 
-    def __call__(self, ax):
+    def __call__(self, ax)->None:
         self.draw(ax)
 
-    def draw(self, ax):
+    def draw(self, ax)->None:
         ax.axvline(x=self.x, linestyle='--', label=self.label, color=self.color, zorder=1)
         
         # Get the current limits of the y-axis
@@ -87,15 +75,31 @@ class VerticalLine:
 
 
 class MovingAverageLinePlot:
+    """
+    Draws a moving avarage line plot
+    """    
     def __init__(self, data: pd.DataFrame, timestamp_col: str, color: str = 'gray'):
         self.data = data
         self.timestamp_col = timestamp_col
         self.color = color
 
-    def __call__(self, ax):
+    def __call__(self, ax)->None:
         self.draw(ax)
 
-    def draw(self, ax):
+    def draw(self, ax)->None:
+        """
+
+        Draws the graphical representation of the object on the provided Axes.
+
+        Parameters:
+        ax (matplotlib.axes.Axes): The Axes object on which to draw the graphical representation. 
+                                    This should be an instance of matplotlib's Axes, which acts 
+                                    as the plotting area for rendering data visualizations.
+
+        Returns:
+        None: This method does not return any value. It modifies the Axes directly to 
+            include the graphical elements.
+        """        
         self.data["moving_avg"] = self.data[self.timestamp_col].rolling(window=1).mean()
         sns.lineplot(data=self.data, x=self.data.index, y="moving_avg", ax=ax, color=self.color)
     
