@@ -110,18 +110,54 @@ class BasicScatterPlot(BasicPlot):
 
 class VerticalLine:
     """
-    Adds a vertical line in a plot, given coordinates
-    """    
-    def __init__(self, x: str, label: str, color: str = 'white', horizontalalignment_text='center' ):
+    A class to add a vertical line to a plot at a specified x-coordinate.
+
+    This class allows for the customization of the vertical line's label, color, and text alignment. 
+    It is designed to enhance the visualization of specific points in a plot by marking them with 
+    dashed vertical lines and associated labels.
+
+    Attributes:
+    x (str): The x-coordinate at which to draw the vertical line.
+    label (str): The label to display alongside the vertical line.
+    color (str): The color of the vertical line (default is 'white').
+    horizontalalignment_text (str): The horizontal alignment of the label text (default is 'center').
+
+    Methods:
+    __call__(ax): Calls the draw method to render the vertical line on the given axes.
+    draw(ax): Draws the vertical line on the specified axes and adds the corresponding label.
+    """
+
+    def __init__(self, x: str, label: str, color: str = 'white', horizontalalignment_text='center'):
+        """
+        Initializes the VerticalLine with the specified parameters.
+
+        Parameters:
+        x (str): The x-coordinate for the vertical line.
+        label (str): The label for the vertical line.
+        color (str): The color of the vertical line (default is 'white').
+        horizontalalignment_text (str): The horizontal alignment of the label text (default is 'center').
+        """
         self.x = x
         self.label = label
         self.color = color
-        self.horizontalalignment_text=horizontalalignment_text 
+        self.horizontalalignment_text = horizontalalignment_text
 
-    def __call__(self, ax)->None:
+    def __call__(self, ax) -> None:
+        """
+        Calls the draw method to render the vertical line.
+
+        Parameters:
+        ax (matplotlib.axes.Axes): The axes on which to draw the vertical line.
+        """
         self.draw(ax)
 
-    def draw(self, ax)->None:
+    def draw(self, ax) -> None:
+        """
+        Draws the vertical line and its label on the specified axes.
+
+        Parameters:
+        ax (matplotlib.axes.Axes): The axes on which to draw the vertical line.
+        """
         ax.axvline(x=self.x, linestyle='--', label=self.label, color=self.color, zorder=1)
         
         # Get the current limits of the y-axis
@@ -136,19 +172,45 @@ class VerticalLine:
 
 class MovingAverageLinePlot:
     """
-    Draws a moving avarage line plot
-    """    
+    A class for drawing a moving average line plot.
+
+    This class takes a DataFrame and a specified timestamp column to calculate and
+    visualize the moving average of a time series.
+
+    Attributes:
+    data (pd.DataFrame): The input data containing the time series values.
+    timestamp_col (str): The name of the column containing timestamp data for the x-axis.
+    color (str): The color of the moving average line (default is 'gray').
+
+    Methods:
+    __call__(ax): Calls the draw method to render the moving average plot on the given axes.
+    draw(ax): Draws the moving average line plot on the specified axes.
+    """
+
     def __init__(self, data: pd.DataFrame, timestamp_col: str, color: str = 'gray'):
+        """
+        Initializes the MovingAverageLinePlot with the provided data and parameters.
+
+        Parameters:
+        data (pd.DataFrame): The input data containing the values to calculate the moving average.
+        timestamp_col (str): The name of the column in the DataFrame to use as the x-axis (timestamp).
+        color (str): The color of the moving average line (default is 'gray').
+        """
         self.data = data
         self.timestamp_col = timestamp_col
         self.color = color
 
-    def __call__(self, ax)->None:
+    def __call__(self, ax) -> None:
+        """
+        Calls the draw method to render the moving average plot.
+
+        Parameters:
+        ax (matplotlib.axes.Axes): The axes on which to draw the moving average line plot.
+        """
         self.draw(ax)
 
     def draw(self, ax)->None:
         """
-
         Draws the graphical representation of the object on the provided Axes.
 
         Parameters:
