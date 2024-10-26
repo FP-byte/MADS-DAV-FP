@@ -7,6 +7,27 @@ from loguru import logger
 import seaborn as sns
 
 class BasicPlot:
+    """
+    A base class for creating basic plots using Matplotlib and Seaborn.
+
+    This class provides common functionalities for initializing plot parameters,
+    including titles, labels, and saving plots. It serves as a foundation for
+    more specific plot types by encapsulating shared behaviors.
+
+    Attributes:
+    config (Config): Configuration object containing settings for the plot.
+    title (str): Title of the plot.
+    xlabel (str): Label for the x-axis.
+    ylabel (str): Label for the y-axis.
+    filename (str): Filename for saving the plot.
+    show_legend (bool): Flag indicating whether to display the legend.
+
+    Methods:
+    __call__(data, *args, **kwargs): Creates the plot with the provided data.
+    show_plot(): Displays the plot with the configured settings.
+    save(): Saves the plot to the specified filename.
+    plot(data, *args, **kwargs): Defines how to create the plot, empty in the basicPlot class.
+    """    
     def __init__(self, config: Config, title_fig: str, xlabel: str, ylabel: str, filename: str, figsize=(12, 8), show_legend: bool = True, legend_title:str=""):
         self.config = config
         self.title_fig = title_fig
@@ -35,11 +56,50 @@ class BasicPlot:
         plt.close()  # Close the figure to free up memory
 
 class BasicScatterPlot(BasicPlot):
+    """
+    A class for creating basic scatter plots using Matplotlib and Seaborn.
+
+    Inherits from BasicPlot and provides functionalities specific to scatter plots,
+    including methods to plot data points and to visualize relationships between variables.
+
+    Attributes:
+    config (Config): Configuration object containing settings for the plot.
+    title (str): Title of the scatter plot.
+    xlabel (str): Label for the x-axis.
+    ylabel (str): Label for the y-axis.
+    show_legend (bool): Flag indicating whether to display the legend.
+
+    Methods:
+    plot(x, y, **kwargs): Creates a scatter plot for the given x and y data.
+    plot_moving_average(data, timestamp_col, window, ax, color): Calculates
+        and plots the moving average for the given data.
+    show_plot(): Displays the scatter plot with configured settings.
+    save(filename): Saves the scatter plot to the specified filename.
+    """
     def __init__(self, config: Config, title_fig: str, xlabel: str, ylabel: str, filename: str, show_legend: bool = True):
+        """
+        Initializes the BasicScatterPlot with the provided configuration and plot parameters.
+
+        Parameters:
+        config (Config): Configuration object for plot settings.
+        title (str): Title of the scatter plot.
+        xlabel (str): Label for the x-axis.
+        ylabel (str): Label for the y-axis.
+        show_legend (bool): Flag to display the legend (default is True).
+        """
         super().__init__(config, title_fig, xlabel, ylabel, filename, show_legend)
 
     def plot(self, x, y, **kwargs):
-        """Create a scatter plot with optional additional parameters."""
+        """
+        Creates a scatter plot with optional additional parameters.
+        Parameters:
+        config (Config): Configuration object for plot settings.
+        title (str): Title of the scatter plot.
+        xlabel (str): Label for the x-axis.
+        ylabel (str): Label for the y-axis.
+        **kwargs: all custom parameters
+
+        """
         sns.scatterplot(x=x, y=y, **kwargs)
 
     def plot_moving_average(self, data: pd.DataFrame, timestamp_col: str, window: int, ax, color: str):
