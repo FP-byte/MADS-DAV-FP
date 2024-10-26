@@ -48,10 +48,11 @@ class Visualizer():
         p_corona = self.preprocessor.calc_messages(df_corona)
         visualization2 = TimeSeriesPlot(
                          title="Digital Silence: The WhatsApp Whisper During Lockdown",
-                         xlabel="Date",
-                         ylabel="Timestamp",
+                         xlabel="Date: year-week",
+                         ylabel="Number of messages",
                          filename = "2_timeseries_visualization.png",
-                         config=self.config
+                         config=self.config, 
+                         show_legend = False # do not show legend in this plot 
                          )
         visualization2(p, p_corona)        
 
