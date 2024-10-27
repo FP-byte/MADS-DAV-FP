@@ -181,13 +181,13 @@ class Preprocessor(FileHandler):
 
         return percentages_sorted
     
-    def prepocess_week1(self):
+    def preprocess_week1(self):
         print("processing visual 1")
         self.add_communication_type()
         return self.aggregate_languages(self.data)
 
 
-    def prepocess_week2(self, startdate='2019-01-01', enddate='2023-01-01'):
+    def preprocess_week2(self, startdate='2019-01-01', enddate='2023-01-01'):
         self.process_dates()          
         # select dataset for corona time - start period
         start_date = datetime.datetime.strptime(startdate, self.config.timeformat).date()

@@ -1,26 +1,21 @@
-
 import pandas as pd
 import seaborn as sns
+import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 from wa_visualizer.settings import Config
 from wa_visualizer.basic_plots import (BasicScatterPlot, VerticalLine, MovingAverageLinePlot)
-
-import seaborn as sns
-import pandas as pd
-
-import matplotlib.pyplot as plt
+from wa_visualizer.data_processing import Preprocessor
 
 class TimeSeriesPlot(BasicScatterPlot):
+    color:str
+    color_highlight:str
+
     def __init__(self, title_fig: str, ylabel: str, xlabel: str, filename: str, config: Config, show_legend: bool = True):
         super().__init__(config, title_fig, xlabel, ylabel, show_legend)  # Pass show_legend to the superclass
         self.filename = filename
         self.show_legend = show_legend
-        #define custom colors for this plot
-        self.color = 'gray'
-        self.color_highlight = 'red'
-        self.color_vertical_line = '#EEE'
-        
+  
 
     def __call__(self, p: pd.DataFrame, p_corona: pd.DataFrame, **kwargs):
         self.create_plot(p, p_corona, **kwargs)
@@ -37,8 +32,8 @@ class TimeSeriesPlot(BasicScatterPlot):
         moving_avg_plot_corona = self.plot_moving_average(p_corona, self.config.timestamp_col, 7, ax, color = self.color_highlight)
 
         # Define and draw vertical lines
-        vertical_line_start = VerticalLine('2020-13', 'Start Intelligent lockdown', self.color_vertical_line, 'right')
-        vertical_line_end = VerticalLine('2021-01', 'End Christmas lockdown', self.color_vertical_line, 'left')
+        vertical_line_start = VerticalLine('2020-13', 'Start Intelligent lockdown', 'right')
+        vertical_line_end = VerticalLine('2021-01', 'End Christmas lockdown', 'left')
 
         vertical_line_start(ax)
         vertical_line_end(ax)
@@ -60,3 +55,34 @@ class TimeSeriesPlot(BasicScatterPlot):
         plt.close()
 
 
+class TimeSeriesPlotVisualizer(Preprocessor):
+    """
+    Visualizes data using time series plots.
+
+    Args:
+        preprocessor (Preprocessor): Class responsible for preprocessing steps.
+    """
+    def __init__(self, preprocessor: Preprocessor):
+        self.config = preprocessor.config
+        self.preprocessor = preprocessor
+        #define custom colors for this plot
+        self.color = 'gray'
+        self.color_highlight = 'red'
+        self.color_vertical_line = '#EEE'
+
+    def visualization_week2(self):
+        """Creates a time series plot for week 2 data."""
+        plot = TimeSeriesPlot(
+            title_fig="Digital Silence: The WhatsApp Whisper During Lockdown",
+            xlabel="Date: year-week",
+            ylabel="Number of messages",
+            filename="2_timeseries_visualization.png",
+            show_legend=False,  # do not show legend in this plot
+            config=self.config
+        )
+        df_corona, df = self.preprocessor.preprocess_week2()
+        p = self.preprocessor.calc_messages(df)
+        p_corona = self.preprocessor.calc_messages(df_corona)
+        plot(p, p_corona)
+
+        

@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from wa_visualizer.base_dataobj import FileHandler
+from wa_visualizer.data_processing import Preprocessor
 import pandas as pd
 from wa_visualizer.settings import Config
 from pathlib import Path
@@ -36,6 +37,9 @@ class BasicPlot:
         self.filename = filename
         self.show_legend = show_legend
         self.legend_title = legend_title
+        #define basic custom colors for plots
+        self.color = 'gray'
+        self.color_highlight = 'red'   
     
     def plot(self, data: pd.DataFrame):
         #to define for each plot
@@ -55,19 +59,32 @@ class BasicPlot:
         plt.savefig(filepath, bbox_inches='tight', transparent=False)
         plt.close()  # Close the figure to free up memory
 
+class BarPlot(BasicPlot):
+    def __init__(self, config: Config, title_fig: str, ylabel: str, xlabel: str, filename: str, legend_title: str = ""):
+        super().__init__(config, title_fig, xlabel, ylabel, filename)
+        self.legend_title = legend_title
+
+    def __call__(self, data, stacked: bool):
+        self.plot(data, stacked)
+        self.show_plot()
+        self.save()
+
+    def plot(self, data: pd.DataFrame, stacked: bool = False):
+        # Plotting
+        ax = data.plot(kind='bar', stacked=stacked, figsize=(10, 8), color=self.config.custom_colors)
+        plt.title(self.title_fig)
+        plt.ylabel(self.ylabel)
+        plt.xlabel(self.xlabel)
+        plt.xticks(rotation=45)
+        plt.legend(title=self.legend_title, bbox_to_anchor=(1.05, 1), loc='upper left')
+
+
 class BasicScatterPlot(BasicPlot):
     """
     A class for creating basic scatter plots using Matplotlib and Seaborn.
 
     Inherits from BasicPlot and provides functionalities specific to scatter plots,
     including methods to plot data points and to visualize relationships between variables.
-
-    Attributes:
-    config (Config): Configuration object containing settings for the plot.
-    title (str): Title of the scatter plot.
-    xlabel (str): Label for the x-axis.
-    ylabel (str): Label for the y-axis.
-    show_legend (bool): Flag indicating whether to display the legend.
 
     Methods:
     plot(x, y, **kwargs): Creates a scatter plot for the given x and y data.
@@ -91,7 +108,7 @@ class BasicScatterPlot(BasicPlot):
 
     def plot(self, x, y, **kwargs):
         """
-        Creates a scatter plot with optional additional parameters.
+        Creates a scatter plot for the given x and y data, with optional additional parameters.
         Parameters:
         config (Config): Configuration object for plot settings.
         title (str): Title of the scatter plot.
@@ -103,7 +120,22 @@ class BasicScatterPlot(BasicPlot):
         sns.scatterplot(x=x, y=y, **kwargs)
 
     def plot_moving_average(self, data: pd.DataFrame, timestamp_col: str, window: int, ax, color: str):
-        """Calculate and plot the moving average."""
+        """
+        Calculates and plots the moving average for the given data.
+
+        This function computes the moving average of a specified time series data column 
+        over a defined window size and then visualizes it on the provided axes.
+
+        Args:
+            data (pd.DataFrame): The input data from which the moving average will be calculated.
+            timestamp_col (str): The name of the column containing the timestamps to be used for calculating the moving average.
+            window (int): The size of the moving window (number of periods) for averaging.
+            ax (matplotlib.axes.Axes): The axes on which to plot the moving average line.
+            color (str): The color of the moving average line for visualization.
+
+        Returns:
+            None: This function does not return any value; it directly modifies the provided axes.
+        """     
         data['moving_avg'] = data[timestamp_col].rolling(window=window).mean()
         moving_avg_plot = MovingAverageLinePlot(data, self.config.timestamp_col, color=color)       
         moving_avg_plot(ax)
@@ -127,14 +159,14 @@ class VerticalLine:
     draw(ax): Draws the vertical line on the specified axes and adds the corresponding label.
     """
 
-    def __init__(self, x: str, label: str, color: str = 'white', horizontalalignment_text='center'):
+    def __init__(self, x: str, label: str,  horizontalalignment_text='center', color: str = 'gray'):
         """
         Initializes the VerticalLine with the specified parameters.
 
         Parameters:
         x (str): The x-coordinate for the vertical line.
         label (str): The label for the vertical line.
-        color (str): The color of the vertical line (default is 'white').
+        color (str): The color of the vertical line (default is 'gray').
         horizontalalignment_text (str): The horizontal alignment of the label text (default is 'center').
         """
         self.x = x
@@ -219,9 +251,19 @@ class MovingAverageLinePlot:
                                     as the plotting area for rendering data visualizations.
 
         Returns:
-        None: This method does not return any value. It modifies the Axes directly to 
-            include the graphical elements.
+        None: This method modifies the Axes directly to include the graphical elements.
         """        
         self.data["moving_avg"] = self.data[self.timestamp_col].rolling(window=1).mean()
         sns.lineplot(data=self.data, x=self.data.index, y="moving_avg", ax=ax, color=self.color)
-    
+
+
+class Visualizer:
+    """
+    Manages the visualizations and receives data from the preprocessor.
+
+    Args:
+        preprocessor (Preprocessor): Class for preprocessing steps.
+    """
+    def __init__(self, preprocessor: Preprocessor):
+        self.config = preprocessor.config
+        self.preprocessor = preprocessor

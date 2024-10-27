@@ -15,7 +15,6 @@ class Config:
     author_col: str
     message_length_col: str
     has_emoji_col: str
-    custom_colors :list
     timeformat: str  
 
 @dataclass

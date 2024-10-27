@@ -5,8 +5,9 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from wa_visualizer.settings import Config
 from wa_visualizer.basic_plots import BasicPlot
+from wa_visualizer.data_processing import Preprocessor
 
-class RelationshipsPlot(BasicPlot):
+class FacetGridPlot(BasicPlot):
     """
     Facegrid regression plot class
 
@@ -64,10 +65,28 @@ class RelationshipsPlot(BasicPlot):
         sns.regplot(x=x, y=y, marker='o', scatter_kws={'s': scatter_size}, label=label, **kwargs)
         plt.grid(False)
 
+class RelationshipsPlotVisualizer(Preprocessor):
+    """
+    Visualizes relationships in data.
 
+    Args:
+        preprocessor (Preprocessor): Class responsible for preprocessing steps.
+    """
+    def __init__(self, preprocessor: Preprocessor):
+        self.config = preprocessor.config
+        self.preprocessor = preprocessor      
 
+    def visualization_week4(self):
+        plot = FacetGridPlot(
+            config=self.config,
+            title_fig="Getting Slower Fingers with Age: Adults Save (Typing) Time with Emojis",
+            xlabel='Author Age',
+            ylabel='Average Log of Message Length',
+            filename='4_relationships_visualization.png',
+        )
 
-
-    
-
-    
+        """Creates a relationships plot for week 4 data."""
+        avg_log_df = self.preprocessor.preprocess_week4()
+        
+        plot(avg_log_df, 'age', 'log_len', scatter_size=60)
+        

@@ -11,78 +11,79 @@ import numpy as np
 from wa_visualizer.data_processing import Preprocessor
 from wa_visualizer.settings import (BaseRegexes, Folders, Config, BaseStrings)
 from wa_visualizer.base_dataobj import FileHandler
-from wa_visualizer.bar_plot import BarPlot
-from wa_visualizer.time_scatter_plot import TimeSeriesPlot
-from wa_visualizer.facegrid_regplot import RelationshipsPlot
-#import logging
+from wa_visualizer.visual_1 import BarPlotVisualizer
+from wa_visualizer.visual_2 import TimeSeriesPlotVisualizer
+from wa_visualizer.visual_4 import RelationshipsPlotVisualizer
 from loguru import logger
 
 # Set up the logger
 #logging.basicConfig(level=logging.INFO)
 #logger = logging.getLogger(__name__)
 
-class Visualizer():
-    """
-    Manages the visualizations and receives data from the preprocessor.
 
-    Args:
-        Preprocess (class): class for proprocess steps
-    """    
-    def __init__(self, preprocessor :Preprocessor):
-      # super().__init__(folders, regexes, config, strings)
-       self.config = preprocessor.config
-       self.preprocessor = preprocessor
+
+# class Visualizer():
+#     """
+#     Manages the visualizations and receives data from the preprocessor.
+
+#     Args:
+#         Preprocess (class): class for proprocess steps
+#     """    
+#     def __init__(self, preprocessor :Preprocessor):
+#       # super().__init__(folders, regexes, config, strings)
+#        self.config = preprocessor.config
+#        self.preprocessor = preprocessor
     
-    def visualization_week1(self):
-        processed_data = self.preprocessor.prepocess_week1()
-        plot1 = BarPlot(title_fig="A Picture Isn't Worth a Thousand Words",
-                                  ylabel="Percentage",
-                                  xlabel="Author",
-                                  filename= "1_categories_visualization.png",
-                                  config=self.config)
-        plot1(processed_data, False)
+#     def visualization_week1(self):
+#         processed_data = self.preprocessor.prepocess_week1()
+#         plot1 = BarPlot(title_fig="A Picture Isn't Worth a Thousand Words",
+#                                   ylabel="Percentage",
+#                                   xlabel="Author",
+#                                   filename= "1_categories_visualization.png",
+#                                   config=self.config)
+#         plot1(processed_data, False)
 
-    def visualization_week2(self):
-        df_corona, df = self.preprocessor.prepocess_week2()
-        p = self.preprocessor.calc_messages(df)
-        p_corona = self.preprocessor.calc_messages(df_corona)
-        visualization2 = TimeSeriesPlot(
-                         title_fig="Digital Silence: The WhatsApp Whisper During Lockdown",
-                         xlabel="Date: year-week",
-                         ylabel="Number of messages",
-                         filename = "2_timeseries_visualization.png",
-                         config=self.config, 
-                         show_legend = False # do not show legend in this plot 
-                         )
-        visualization2(p, p_corona)        
+#     def visualization_week2(self):
+#         df_corona, df = self.preprocessor.prepocess_week2()
+#         p = self.preprocessor.calc_messages(df)
+#         p_corona = self.preprocessor.calc_messages(df_corona)
+#         visualization2 = TimeSeriesPlot(
+#                          title_fig="Digital Silence: The WhatsApp Whisper During Lockdown",
+#                          xlabel="Date: year-week",
+#                          ylabel="Number of messages",
+#                          filename = "2_timeseries_visualization.png",
+#                          config=self.config, 
+#                          show_legend = False # do not show legend in this plot 
+#                          )
+#         visualization2(p, p_corona)        
 
-    def visualization_week3(self):
+#     def visualization_week3(self):
        
-        df_counts_normalized = self.preprocessor.preprocess_week3()
-        self.config.custom_colors = ["lightgray", 'gray', "#333",'salmon', '#EEE',  '#444']
-        # Create the visualization instance
-        plot3 = BarPlot(title_fig='Are you Coming Home? Late-Night WhatsApp Chats with Teens',
-                                  ylabel='Percentage of Total Messages',
-                                  xlabel='Hour of the Day',
-                                  filename= "3_categories_visualization.png",
-                                  config=self.config,
-                                  legend_title = 'Topics')
-        plot3(df_counts_normalized, True)
+#         df_counts_normalized = self.preprocessor.preprocess_week3()
+#         self.config.custom_colors = ["lightgray", 'gray', "#333",'salmon', '#EEE',  '#444']
+#         # Create the visualization instance
+#         plot3 = BarPlot(title_fig='Are you Coming Home? Late-Night WhatsApp Chats with Teens',
+#                                   ylabel='Percentage of Total Messages',
+#                                   xlabel='Hour of the Day',
+#                                   filename= "3_categories_visualization.png",
+#                                   config=self.config,
+#                                   legend_title = 'Topics')
+#         plot3(df_counts_normalized, True)
     
-    def visualization_week4(self):
-        #avg_log_length_withemoji, avg_log_length_withoutemoji = self.preprocessor.preprocess_week4()
-        avg_log_df = self.preprocessor.preprocess_week4()
+#     def visualization_week4(self):
+#         #avg_log_length_withemoji, avg_log_length_withoutemoji = self.preprocessor.preprocess_week4()
+#         avg_log_df = self.preprocessor.preprocess_week4()
 
-        #Create the plot
-        plot = RelationshipsPlot(
-            config=self.config,
-            title_fig="Getting Slower Fingers with Age: Adults Save (Typing) Time with Emoji's",
-            xlabel='Author Age',
-            ylabel='Average Log of Message Length',
-            filename='4_relationships_visualization.png')
+#         #Create the plot
+#         plot = RelationshipsPlot(
+#             config=self.config,
+#             title_fig="Getting Slower Fingers with Age: Adults Save (Typing) Time with Emoji's",
+#             xlabel='Author Age',
+#             ylabel='Average Log of Message Length',
+#             filename='4_relationships_visualization.png')
 
-        # Call the plot
-        plot(avg_log_df, 'age', 'log_len', scatter_size=60)
+#         # Call the plot
+#         plot(avg_log_df, 'age', 'log_len', scatter_size=60)
 
 
 @click.command()
@@ -121,7 +122,6 @@ def main(week, all):
         author_col = 'author',
         has_emoji_col= 'has_emoji',
         message_length_col= 'message_length',
-        custom_colors = ["lightgray",  'salmon', 'gray','#EEE',"#333", '#444'],
         timeformat= "%Y-%m-%d"
     )
 
@@ -141,26 +141,35 @@ def main(week, all):
             dob_mapping = {'effervescent-camel': 2002, 'nimble-wombat':1971, 'hilarious-goldfinch':1972,
                     'spangled-rabbit':2004}
         )
-        processor = Preprocessor(folders, regexes, config, strings)
-        visualizer = Visualizer(processor)
-        
+        preprocessor = Preprocessor(folders, regexes, config, strings)
+        bar_plot_visualizer = False
 
         if week.lower()=="1" or all:
             print("week 1")
-            visualizer.visualization_week1()
+            if not bar_plot_visualizer:
+                bar_plot_visualizer = BarPlotVisualizer(preprocessor)
+                
+            bar_plot_visualizer.visualization_week1()
             
 
         if week.lower()=="2" or all:
             print("week 2")
-            visualizer.visualization_week2()
+            time_series_plot_visualizer = TimeSeriesPlotVisualizer(preprocessor)
+            time_series_plot_visualizer.visualization_week2()
+            
+            
 
         if week.lower()=="3" or all:
             print("week 3")
-            visualizer.visualization_week3()
+            if not bar_plot_visualizer:
+                bar_plot_visualizer = BarPlotVisualizer(preprocessor)
+            bar_plot_visualizer.visualization_week3()
+            
 
         if week.lower()=="4" or all:
             print("week 4")
-            visualizer.visualization_week4()
+            relationships_plot_visualizer = RelationshipsPlotVisualizer(preprocessor)
+            relationships_plot_visualizer.visualization_week4()
         
 
 if __name__ == "__main__":   
