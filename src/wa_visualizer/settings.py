@@ -31,6 +31,7 @@ class Folders:
     processed: Path
     datafile: Path
     current: Path
+    csv: Path
     
 
     

@@ -50,7 +50,9 @@ class TimeSeriesPlot(BasicScatterPlot):
 
         # Save the plot
         filename = self.config.img_dir / Path(self.filename)
-        plt.savefig(filename, bbox_inches='tight', transparent=False)
+        #plt.savefig(filename, bbox_inches='tight', transparent=False)
+        self.save()
+
         self.show_plot()  # Show the plot with the legend setting
         plt.close()
 

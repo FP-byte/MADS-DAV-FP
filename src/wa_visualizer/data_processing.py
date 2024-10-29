@@ -5,7 +5,7 @@ from loguru import logger
 import pandas as pd
 import numpy as np
 from wa_visualizer.settings import (BaseRegexes, Folders, Config, BaseStrings)
-from wa_visualizer.base_dataobj import FileHandler
+from wa_visualizer.filehandler import FileHandler
 
 class Preprocessor(FileHandler):
     """
@@ -73,8 +73,7 @@ class Preprocessor(FileHandler):
         #removes return and new lines
         for pattern in self.regexes.patterns.values():
             text = self.find_replace_pattern(text, pattern)
-            print(text)
-       
+            
         return text.strip()
     
     def clean_data(self):
@@ -84,7 +83,7 @@ class Preprocessor(FileHandler):
         df = self.data 
         message = self.config.message_col     
         # remove returns and new lines
-        df[message] = df[message].appy(self.clean_message)
+        df[message] = df[message].apply(self.clean_message)
         empty_messages = df[df[message]==""].index
         df.drop(empty_messages, axis=0, inplace=True)
         #rerun emoticon detection for missing emoij's
@@ -123,10 +122,10 @@ class Preprocessor(FileHandler):
         """        
 
         for idx, row in self.data.iterrows():
-            text=row.message.replace('\r', "").replace('\n', "").replace('?', "").lower()
+            text=row.message.replace('\r', "").replace('\n', "").replace('?', "").replace('!', "").lower()
             text=text.strip().split(" ") 
             # Check for non-verbal indicators
-            if '<Media' in row.message or 'http' in row.message:
+            if '<media' in row.message or 'http' in row.message or 'www.' in row.message:
                 self.data.at[idx, 'language'] = "Non-verbal"
             elif len(text) == 1 and row['has_emoji']:
                 self.data.at[idx, 'language'] = 'Non-verbal'             
@@ -212,9 +211,9 @@ class Preprocessor(FileHandler):
         print('preprocess week 3')
         df = self.data.copy()
         # Define keywords for each category (selection by hand on the base of frequency and word counts)
-        eten_keywords = ['\beten\b', 'eet', "gegeten", 'blijf eten', 'lunch', 'pizza', 'pasta', 'mangia', 'pranzo', 'cena', 'prosciutto', 'kip', 'latte', 'snack', 'indonesisch', 'kapsalon', 'kps', 'delfino', 'ninh', 'bihn']
+        eten_keywords = ['\beten\b', 'eet', "gegeten", 'blijf eten', 'lunch', 'pizza', 'pasta', 'mangia', 'pranzo', 'cena', 'prosciutto', 'kip', 'latte', 'snack', 'indonesisch', 'kapsalon', 'kps', 'delfino', 'ninh', 'bihn', 'spareribs']
         plans_keywords = ['vanavond', 'vandaag', 'morgen', 'afspraak', 'domani', 'stasera', 'ochtend']
-        place_keywords = ['trein', 'hilversum', 'amsterdam', 'thuis', 'huis', 'ik ben in', 'dallas', 'spanje', 'mexico', 'indonesië', 'hotel', 'onderweg', 'casa']
+        place_keywords = ['trein', 'hilversum', 'amsterdam', 'thuis', 'huis', 'ik ben in', 'dallas', 'spanje', 'mexico', 'indonesië', 'hotel', 'onderweg', 'casa', 'florence', 'italie', 'schiphol']
         people_keywords = self.data.author.unique().tolist() + ['papa','mama', 'nonno', 'nonna', 'giacomo', 'opa', 'oma', 'siem', 'tessa', 'ouders']
         
         df['hour'] = df[self.config.timestamp_col].dt.hour
@@ -267,9 +266,6 @@ class Preprocessor(FileHandler):
         # Step 2: Normalize each column (Food, Plans, People, Places, Other) to percentages
         df_normalized = df_counts.fillna(0).iloc[:, :-1].div(df_counts['Total'], axis=0) * 100
 
-        # Display the normalized DataFrame
-        #print(df_normalized)    
-
         return df_normalized
 
     def preprocess_week4(self):
@@ -302,6 +298,6 @@ class Preprocessor(FileHandler):
         # add date transformation for visualizazion 2
         self.process_dates()
         #save preprocessed data
-        #self.save_data(self.datafile)
+        self.save_data()
 
 

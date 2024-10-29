@@ -17,7 +17,7 @@ class FacetGridPlot(BasicPlot):
     def __init__(self, config: Config, title_fig: str, xlabel: str, ylabel: str, filename: str, show_legend: bool = False):
         super().__init__(config, title_fig, xlabel, ylabel, filename, show_legend)  # Initialize basicPlot superclass
         #custom colors
-        self.color_palette = {'With Emoji': 'salmon', 'Without Emoji': 'blue'}
+        self.color_palette = {'With Emoji': 'salmon', 'Without Emoji': '#444'}
 
     def __call__(self, data: pd.DataFrame, x: str, y: str, **kwargs):
         self.create_plot(data, x, y, **kwargs)  # Pass additional kwargs to create_plot
@@ -46,10 +46,12 @@ class FacetGridPlot(BasicPlot):
 
         # Adjust layout to avoid overlap with the main title
         plt.subplots_adjust(top=0.85)
+        # Seve the plot
+        self.save()
 
         # Finally, show the plot
-        plt.show()
-        self.save()
+        self.show_plot()  # Show the plot with the legend setting
+        
 
     def plot(self, x: str, y: str, scatter_size: int, label: str = None, **kwargs):
         """

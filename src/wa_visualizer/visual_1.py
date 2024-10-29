@@ -16,12 +16,21 @@ class BarPlot(BasicPlot):
 
     def __call__(self, data, stacked: bool):
         self.plot(data, stacked)
-        self.show_plot()
         self.save()
+        self.show_plot()
+        
 
     def plot(self, data: pd.DataFrame, stacked: bool = False):
         # Plotting
         ax = data.plot(kind='bar', stacked=stacked, figsize=(10, 8), color=self.custom_colors)
+        # Annotate each bar with the percentage
+        if not stacked:
+            for p in ax.patches:
+                ax.annotate(f'{p.get_height():.1f}%', 
+                                    (p.get_x() + p.get_width() / 2, p.get_height()), 
+                                    ha='center', va='bottom', 
+                                    fontsize=10)
+
         plt.title(self.title_fig)
         plt.ylabel(self.ylabel)
         plt.xlabel(self.xlabel)
@@ -57,7 +66,7 @@ class BarPlotVisualizer(Preprocessor):
             title_fig="Are you Coming Home? Late-Night WhatsApp Chats with Teens",
             ylabel="Percentage of Total Messages",
             xlabel="Hour of the Day",
-            filename="3_categories_visualization.png",
+            filename="3_distribution_visualization.png",
             config=self.config,
             legend_title='Topics'
         )

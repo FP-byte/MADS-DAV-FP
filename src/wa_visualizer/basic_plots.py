@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from wa_visualizer.base_dataobj import FileHandler
+from wa_visualizer.filehandler import FileHandler
 from wa_visualizer.data_processing import Preprocessor
 import pandas as pd
 from wa_visualizer.settings import Config
@@ -53,11 +53,13 @@ class BasicPlot:
         if self.show_legend:
             plt.legend(title=self.legend_title, bbox_to_anchor=(1.0, 1), loc='upper left')
         plt.show()
+        plt.close()  # Close the figure to free up memory
 
     def save(self):
         filepath = self.config.img_dir / Path(self.filename)
         plt.savefig(filepath, bbox_inches='tight', transparent=False)
-        plt.close()  # Close the figure to free up memory
+        print(f"Plot saved to: {filepath}")
+        
 
 class BarPlot(BasicPlot):
     def __init__(self, config: Config, title_fig: str, ylabel: str, xlabel: str, filename: str, legend_title: str = ""):
