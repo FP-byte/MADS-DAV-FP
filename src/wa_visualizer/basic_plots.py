@@ -64,6 +64,27 @@ class BasicPlot:
         
 
 class BarPlot(BasicPlot):
+    """
+    A base class for creating bar plots using Matplotlib
+
+    This class provides inherits from Basic Plot the common functionalities for initializing plot parameters,
+    including titles, labels, and saving plots. 
+
+    Attributes:
+    config (Config): Configuration object containing settings for the plot.
+    title (str): Title of the plot.
+    xlabel (str): Label for the x-axis.
+    ylabel (str): Label for the y-axis.
+    filename (str): Filename for saving the plot.
+    legend_title (st): Title of the egen
+
+    Methods:
+    __call__(data, stacked): Creates the bar plot with the provided data 
+    show_plot(): Shows the plot
+    save(): Saves the plot to the specified filename.
+    plot(data, stacked): Defines how to create the plot, in a stacked way if stacked is set to True
+    """  
+
     def __init__(self, config: Config, title_fig: str, ylabel: str, xlabel: str, filename: str, legend_title: str = ""):
         super().__init__(config, title_fig, xlabel, ylabel, filename)
         self.legend_title = legend_title
@@ -73,8 +94,13 @@ class BarPlot(BasicPlot):
         self.show_plot()
         self.save()
 
-    def plot(self, data: pd.DataFrame, stacked: bool = False):
-        # Plotting
+    def plot(self, data: pd.DataFrame, stacked: bool = False)->None:
+        """
+        Creates a bar plot for the given x and y data, with optional additional parameters.
+        Parameters:
+        stacked (bool): Stacks the bars if set to true, defult is False
+        data(pd.DataFrame): data to plot
+        """
         ax = data.plot(kind='bar', stacked=stacked, figsize=(10, 8), color=self.config.custom_colors)
         plt.title(self.title_fig)
         plt.ylabel(self.ylabel)
@@ -110,7 +136,7 @@ class BasicScatterPlot(BasicPlot):
         """
         super().__init__(config, title_fig, xlabel, ylabel, filename, show_legend)
 
-    def plot(self, x, y, **kwargs):
+    def plot(self, x, y, **kwargs)->None:
         """
         Creates a scatter plot for the given x and y data, with optional additional parameters.
         Parameters:
@@ -123,7 +149,7 @@ class BasicScatterPlot(BasicPlot):
         """
         sns.scatterplot(x=x, y=y, **kwargs)
 
-    def plot_moving_average(self, data: pd.DataFrame, timestamp_col: str, window: int, ax, color: str):
+    def plot_moving_average(self, data: pd.DataFrame, timestamp_col: str, window: int, ax, color: str)-> None:
         """
         Calculates and plots the moving average for the given data.
 
@@ -259,15 +285,3 @@ class MovingAverageLinePlot:
         """        
         self.data["moving_avg"] = self.data[self.timestamp_col].rolling(window=1).mean()
         sns.lineplot(data=self.data, x=self.data.index, y="moving_avg", ax=ax, color=self.color)
-
-
-class Visualizer:
-    """
-    Manages the visualizations and receives data from the preprocessor.
-
-    Args:
-        preprocessor (Preprocessor): Class for preprocessing steps.
-    """
-    def __init__(self, preprocessor: Preprocessor):
-        self.config = preprocessor.config
-        self.preprocessor = preprocessor
