@@ -90,5 +90,5 @@ class RelationshipsPlotVisualizer(Preprocessor):
         """Creates a relationships plot for week 4 data."""
         avg_log_df = self.preprocessor.preprocess_week4()
         
-        plot(avg_log_df, 'age', 'log_len', scatter_size=60)
+        plot(avg_log_df, self.config.age_col, self.config.log_length_col, scatter_size=60)
         

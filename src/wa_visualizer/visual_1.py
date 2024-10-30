@@ -71,6 +71,6 @@ class BarPlotVisualizer(Preprocessor):
             legend_title='Topics',
 
         )
-        plot.custom_colors = ['salmon', 'gray', '#444',   'darkgray', '#EEE',"lightgray",    ]
+        plot.custom_colors = self.config.color_palette
         df_counts_normalized = self.preprocessor.preprocess_week3()
         plot(df_counts_normalized, True)

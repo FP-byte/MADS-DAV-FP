@@ -26,6 +26,10 @@ class Config:
     isoweek_col:str
     year_week_col:str
     timeformat: str 
+    basic_color: str
+    basic_palette: list
+    basic_color_highlight: str
+    color_vertical_line: str
 
 @dataclass
 class BaseStrings:

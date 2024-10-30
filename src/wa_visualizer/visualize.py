@@ -65,7 +65,11 @@ def main(week, all):
         date_col = 'date',
         isoweek_col = 'isoweek',
         year_week_col = 'year-week',
-        timeformat= "%Y-%m-%d"
+        timeformat= "%Y-%m-%d",
+        basic_color= 'gray',
+        basic_palette= ['salmon', 'gray', '#444', 'darkgray', '#EEE',"lightgray"],
+        basic_color_highlight = 'salmon',
+        color_vertical_line = '#EEE'
     )
 
         regexes = BaseRegexes(patterns={

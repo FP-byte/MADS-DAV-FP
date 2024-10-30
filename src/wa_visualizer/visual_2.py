@@ -68,9 +68,9 @@ class TimeSeriesPlotVisualizer(Preprocessor):
         self.config = preprocessor.config
         self.preprocessor = preprocessor
         #define custom colors for this plot
-        self.color = 'gray'
-        self.color_highlight = 'red'
-        self.color_vertical_line = '#EEE'
+        self.color = self.config.basic_color
+        self.color_highlight = self.config.basic_color_highlight
+        self.color_vertical_line = self.config.color_vertical_line
 
     def visualization_week2(self):
         """Creates a time series plot for week 2 data."""

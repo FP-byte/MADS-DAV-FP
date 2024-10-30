@@ -38,10 +38,10 @@ class BasicPlot:
         self.show_legend = show_legend
         self.legend_title = legend_title
         #define basic custom colors for plots
-        self.color = 'gray'
-        self.color_highlight = 'red'
+        self.color = self.config.basic_color
+        self.color_highlight = self.config.basic_color_highlight
         #set gray scala colors as default
-        self.custom_colors = ['gray', "lightgray", 'darkgray', '#EEE']   
+        self.custom_colors = self.config.basic_palette 
     
     def plot(self, data: pd.DataFrame):
         #to define for each plot
