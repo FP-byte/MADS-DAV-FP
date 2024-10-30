@@ -30,7 +30,7 @@ class FacetGridPlot(BasicPlot):
             x (str):column name to plot on x-axis
             y (str):column name to plot on y-axis 
         """        
-        g = sns.FacetGrid(data, col='emoji_status', hue='emoji_status', height=5, aspect=1.5, palette=self.color_palette)
+        g = sns.FacetGrid(data, col=self.config.emoji_status_col, hue=self.config.emoji_status_col, height=5, aspect=1.5, palette=self.color_palette)
 
         # Map the regression plot using the plot method from the RegPlot class
         g.map_dataframe(self.plot, x, y, scatter_size=60)

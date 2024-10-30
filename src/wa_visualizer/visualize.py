@@ -55,16 +55,26 @@ def main(week, all):
         author_col = 'author',
         has_emoji_col= 'has_emoji',
         message_length_col= 'message_length',
+        topic_col='topic',
+        log_length_col= 'log_len',
+        age_col= 'age',
+        emoji_status_col= 'emoij_status',
+        year_col= 'year',
+        language_col = 'language',
+        hour_col = 'hour',
+        date_col = 'date',
+        isoweek_col = 'isoweek',
+        year_week_col = 'year-week',
         timeformat= "%Y-%m-%d"
     )
 
         regexes = BaseRegexes(patterns={
-            "email" : r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}",
-            "date_phone" : r'^\d{2}-\d{2}-\d{4} \d{2}:\d{2} - \+\d{2} \d{2} \d{4} \d{4}: ',
-            "telephone" : r"@\d{10,13}(?:[ ;:,.]|)",
-            "media_weggelaten": r'<media weggelaten>',
-            "return_newline": r'[\r\n?]',
-            # "username_pattern" : r"^@[a-zA-Z0-9._]+"
+            #patterns to delete from messages
+            "email" : r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", # detect all emails
+            "date_phone" : r'^\d{2}-\d{2}-\d{4} \d{2}:\d{2} - \+\d{2} \d{2} \d{4} \d{4}: ', # detect date followed by phone
+            "bericht_verwijderd": r'bericht verwijderd', # delete message about deleted messages 
+            "return_newline": r'[\r\n?]', # returns en new lines
+            "username_pattern" : r"^@[a-zA-Z0-9._]+"
         } )
 
         strings = BaseStrings(

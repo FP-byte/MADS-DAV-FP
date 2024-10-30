@@ -75,20 +75,52 @@ class Preprocessor(FileHandler):
             text = self.find_replace_pattern(text, pattern)
             
         return text.strip()
+
+    def delete_system_messages(self, df:pd.DataFrame, author:str)-> pd.DataFrame:
+        """
+        Delete authomatic system messages under the same author name
+
+        Args:
+            df (pd.DataFrame): data to change
+            author (str): author name as given to automatic author messages
+        Returns:
+            pd.DataFrame: dataframe without the author
+        """        	    
+        sys_messages = df[df[self.config.author_col]==author].index
+        df.drop(sys_messages, inplace=True, axis=0)
+        return df
+    
+    def merge_users(self, df:pd.DataFrame, author1:str, author2:str):
+        """
+        Merge two users which are using aliases, for ex. two different telephones but are the same person
+
+        Args:
+            df (pd.DataFrame): dataframe to modify
+            author1 (str): author1 is the main author
+            author2 (str): author alias to replace with author1 
+        """        
+        df.loc[df[self.config.author_col]==author2, 'author'] = author1
+        return df
+
+
     
     def clean_data(self):
         """
-        Data cleaning logic
+        Data cleaning
         """  
         df = self.data 
-        message = self.config.message_col     
-        # remove returns and new lines
+        message = self.config.message_col
+        #delete system messages 
+        df = self.delete_system_messages(df, 'glittering-penguin')
+        #merging two users 
+        df = self.merge_users(df, 'effervescent-camel','funny-bouncing')  
+        # remove messages with regex
         df[message] = df[message].apply(self.clean_message)
         empty_messages = df[df[message]==""].index
         df.drop(empty_messages, axis=0, inplace=True)
         #rerun emoticon detection for missing emoij's
         df[self.config.has_emoji_col] =df[message].apply(self.has_emoji)
-        #delete empty rows
+        
 
     
     def detect_language(self, text)-> str:
@@ -125,20 +157,21 @@ class Preprocessor(FileHandler):
             text=row.message.replace('\r', "").replace('\n', "").replace('?', "").replace('!', "").lower()
             text=text.strip().split(" ") 
             # Check for non-verbal indicators
-            if '<media' in row.message or 'http' in row.message or 'www.' in row.message:
-                self.data.at[idx, 'language'] = "Non-verbal"
-            elif len(text) == 1 and row['has_emoji']:
-                self.data.at[idx, 'language'] = 'Non-verbal'             
+            if '<Media' in row.message or 'http' in row.message or 'www.' in row.message:
+                self.data.at[idx, self.config.language_col] = "Non-verbal"
+            elif len(text) == 1 and row[self.config.has_emoji_col]:
+                self.data.at[idx, self.config.language_col] = 'Non-verbal'             
             else:
                 # detect language 
-                self.data.at[idx, 'language'] = self.detect_language(text)
+                self.data.at[idx, self.config.language_col] = self.detect_language(text)
 
-    def process_dates(self):
-        """add dates information
+    def process_dates(self)-> None:
+        """
+        Adds dates information to the dataframe
         """            
-        self.data["date"] = self.data[self.config.timestamp_col].dt.date
-        self.data["isoweek"] = self.data[self.config.timestamp_col].dt.isocalendar().week
-        self.data["year-week"] = self.data[self.config.timestamp_col].dt.strftime("%Y-%W")
+        self.data[self.config.date_col] = self.data[self.config.timestamp_col].dt.date
+        self.data[self.config.isoweek_col] = self.data[self.config.timestamp_col].dt.isocalendar().week
+        self.data[self.config.year_week_col] = self.data[self.config.timestamp_col].dt.strftime("%Y-%W")
     
     def select_dates(self, df, start_date, end_date):
         if 'date' in df:
@@ -207,91 +240,105 @@ class Preprocessor(FileHandler):
     def contains_keywords(self, series, keywords):
          return series.str.contains('|'.join(keywords), case=False, regex=True)
 
+    def filter_by_keywords(self, df, keywords, topic):
+        """Filter DataFrame rows based on keywords and assign a topic."""
+        df.loc[self.contains_keywords(df[self.config.message_col], keywords), 'topic'] = topic
+        return df[df['topic'] == topic]
+
+
     def preprocess_week3(self):
         print('preprocess week 3')
         df = self.data.copy()
-        # Define keywords for each category (selection by hand on the base of frequency and word counts)
-        eten_keywords = ['\beten\b', 'eet', "gegeten", 'blijf eten', 'lunch', 'pizza', 'pasta', 'mangia', 'pranzo', 'cena', 'prosciutto', 'kip', 'latte', 'snack', 'indonesisch', 'kapsalon', 'kps', 'delfino', 'ninh', 'bihn', 'spareribs']
-        plans_keywords = ['vanavond', 'vandaag', 'morgen', 'afspraak', 'domani', 'stasera', 'ochtend']
-        place_keywords = ['trein', 'hilversum', 'amsterdam', 'thuis', 'huis', 'ik ben in', 'dallas', 'spanje', 'mexico', 'indonesië', 'hotel', 'onderweg', 'casa', 'florence', 'italie', 'schiphol']
-        people_keywords = self.data.author.unique().tolist() + ['papa','mama', 'nonno', 'nonna', 'giacomo', 'opa', 'oma', 'siem', 'tessa', 'ouders']
+        df[self.config.hour_col] = df[self.config.timestamp_col].dt.hour
+
+        # Define keywords for each category
+        keywords = {
+            'home coming': ['kom', 'naar huis', 'hoe laat', 'hoelaat', 'laat', 'slapen', 'slaap bij', 'donker', 'bed', 'thuis', 'huis', 'terug', 'blijf bij', 'ik ben in','onderweg', 'casa', 'notte', 'nacht', 'sleutel', 'blijven', 'vannacht'],
+            'reizen': [
+                 'hilversum', 'amsterdam', 'reis', 'arrivati', 'aangekomen', 'vertrek', 'ingecheckt'
+                 'dallas', 'spanje', 'mexico', 'bus', 'boot', 'trein',
+                'indonesië', 'hotel', 'florence', 'italie', 'schiphol', 'grado', 'tiare', 'ho chi minh', 
+            ],
+            'food': [
+                r'\beten\b', 'eet', "gegeten", 'blijf eten', 'lunch', 
+                'pizza', 'pasta', 'mangia', 'pranzo', 'cena', 
+                'prosciutto', 'kip', 'latte', 'snack', 
+                'indonesisch', 'kapsalon', 'kps', 'delfino', 
+                'ninh', 'bihn', 'spareribs'
+            ],           
+            
+            #'plans': ['vanavond', 'vandaag', 'morgen', 'afspraak', 'domani', 'stasera', 'ochtend', 'oggi', 'domani'],
+            'people': self.data.author.unique().tolist() + [
+                'papa', 'mama', 'nonno', 'nonna', 'giacomo', 'greta',
+                'opa', 'oma', 'siem', 'tessa', 'ouders', 'mila', 'julia', 'vera'
+            ]
+        }
+
+        # Initialize an empty dictionary to hold filtered DataFrames
+        filtered_dfs = {topic: None for topic in keywords.keys()}
+
+        for topic, words in keywords.items():
+            filtered_dfs[topic] = self.filter_by_keywords(df, words, topic)
+            df = df[df[self.config.topic_col] != topic]  # Remove rows already categorized
         
-        df['hour'] = df[self.config.timestamp_col].dt.hour
-        df.loc[self.contains_keywords(df[self.config.message_col], eten_keywords), 'topic'] = 'food'
-        # Filter DataFrame to remove rows that contain 'food'
-        df_food = df[df['topic'] == 'food']
-        df  = df[df['topic'] != 'food']
-        
-        # Filter DataFrame to remove rows that contain 'plans'
-        df.loc[self.contains_keywords(df[self.config.message_col], plans_keywords), 'topic'] = 'plans'
-        df_plans = df[df['topic'] == 'plans']
-        df = df[df['topic'] != 'plans']
+        # Remaining rows are classified as 'other'
+        # Filter out non verbal messages
+        filtered_dfs['other'] = df[df[self.config.language_col]!='Non-verbal']
 
-        # Filter DataFrame to remove rows that contain 'places'
-        df.loc[self.contains_keywords(df[self.config.message_col], place_keywords), 'topic'] = 'places'
-        df_places = df[df['topic'] == 'places']
-        df = df[df['topic'] != 'places']
+        df_all = pd.concat(filtered_dfs.values(), ignore_index=True)
 
-        # Filter DataFrame to remove rows that contain 'people'
-        df.loc[self.contains_keywords(df[self.config.message_col], people_keywords), 'topic'] = 'people'
-        df_people = df[df['topic'] == 'people']
-        df_other = df[df['topic'] != 'people']   
-
-        df_all = pd.concat([df_other, df_food, df_plans, df_places, df_people])
-        if df_all.shape[0]== self.data.shape[0]:
+        if df_all.shape[0] == self.data.shape[0]:
             file_topics = self.folders.processed / Path(self.folders.current).stem
-            self.data.to_csv(f"{file_topics}.csv", index=False)        
+           # self.data.to_csv(f"{file_topics}_with_topics.csv", index=False)
+            self.save_data()
         else:
             print('Could not add topics to data')
-        #create topics counts
+
+        # Create topics counts
         self.whatsapp_topics = {
-        'food': df_food['hour'].value_counts().sort_index(),
-        'plans': df_plans['hour'].value_counts().sort_index(),
-        'places': df_places['hour'].value_counts().sort_index(),
-        'people': df_people['hour'].value_counts().sort_index(),
-        'other': df_other['hour'].value_counts().sort_index(),
+            topic: df['hour'].value_counts().sort_index() for topic, df in filtered_dfs.items() if df is not None
         }
+
         # Create a DataFrame and reindex to ensure all hours are included
         df_counts = pd.DataFrame({
-            'Food': pd.Series(self.whatsapp_topics['food'], name='Food'),
-            'Plans': pd.Series(self.whatsapp_topics['plans'], name='Plans'),           
-            'People': pd.Series(self.whatsapp_topics['people'], name='People'),
-            'Places': pd.Series(self.whatsapp_topics['places'], name='Places'),
-            'Other': pd.Series(self.whatsapp_topics['other'], name='Other')           
+            topic.capitalize(): pd.Series(self.whatsapp_topics[topic], name=topic.capitalize())
+            for topic in self.whatsapp_topics.keys()
         }).fillna(0).reindex(range(24), fill_value=0)
 
-        # Step 1: Calculate total counts for each hour
+        # Calculate total counts for each hour
         df_counts['Total'] = df_counts.sum(axis=1)
 
-        # Step 2: Normalize each column (Food, Plans, People, Places, Other) to percentages
-        df_normalized = df_counts.fillna(0).iloc[:, :-1].div(df_counts['Total'], axis=0) * 100
+        # Normalize each column to percentages
+        df_normalized = df_counts.iloc[:, :-1].div(df_counts['Total'], axis=0) * 100
 
         return df_normalized
 
+
     def preprocess_week4(self):
         df = self.data.copy()
-        
         # Include age in the features (cleanup stage)
-        df['year'] = df[self.config.timestamp_col].dt.year  # Extract year from datetime
+        df[self.config.year_col] = df[self.config.timestamp_col].dt.year  # Extract year from datetime
         df['dob'] = df[self.config.author_col].map(self.strings.dob_mapping)
-        df['age'] = df['year'] - df['dob']
+        df[self.config.age_col] = df[self.config.year_col] - df['dob']
         df.drop(['dob'], inplace=True, axis=1)
+        print(df.columns)
+        df[self.config.message_length_col] = df[self.config.message_col].str.len()
 
         # Calculate the logarithm of message length
-        df["log_len"] = df[self.config.message_length_col].apply(lambda x: np.log(x) if x > 0 else 0)  # Handle log(0)
+        df[self.config.log_length_col] = df[self.config.message_length_col].apply(lambda x: np.log(x) if x > 0 else 0)  # Handle log(0)
 
         # Create a new column to categorize messages based on emoji presence
-        df['emoji_status'] = df['has_emoji'].apply(lambda x: 'With Emoji' if x > 0 else 'Without Emoji')
+        df[self.config.emoji_status_col] = df[self.config.has_emoji_col].apply(lambda x: 'With Emoji' if x > 0 else 'Without Emoji')
 
         # Calculate the average log length per age
-        avg_log_df = df.groupby(['age', 'emoji_status'])['log_len'].mean().reset_index()
+        avg_log_df = df.groupby([self.config.age_col, self.config.emoji_status_col])[self.config.log_length_col].mean().reset_index()
     
         return avg_log_df
 
     def process(self):
         """
         Data transformation steps needed prior the visualizations
-        """               
+        """           
         self.clean_data()
         # add language column for visualization 1
         self.add_communication_type()

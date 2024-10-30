@@ -39,7 +39,9 @@ class BasicPlot:
         self.legend_title = legend_title
         #define basic custom colors for plots
         self.color = 'gray'
-        self.color_highlight = 'red'   
+        self.color_highlight = 'red'
+        #set gray scala colors as default
+        self.custom_colors = ['gray', "lightgray", 'darkgray', '#EEE']   
     
     def plot(self, data: pd.DataFrame):
         #to define for each plot

@@ -12,7 +12,7 @@ class BarPlot(BasicPlot):
     def __init__(self, config: Config, title_fig: str, ylabel: str, xlabel: str, filename: str, legend_title: str = ""):
         super().__init__(config, title_fig, xlabel, ylabel, filename)
         self.legend_title = legend_title
-        self.custom_colors = ["lightgray", 'gray', "#333",'salmon', '#EEE',  '#444']
+        
 
     def __call__(self, data, stacked: bool):
         self.plot(data, stacked)
@@ -68,7 +68,9 @@ class BarPlotVisualizer(Preprocessor):
             xlabel="Hour of the Day",
             filename="3_distribution_visualization.png",
             config=self.config,
-            legend_title='Topics'
+            legend_title='Topics',
+
         )
+        plot.custom_colors = ['salmon', 'gray', '#444',   'darkgray', '#EEE',"lightgray",    ]
         df_counts_normalized = self.preprocessor.preprocess_week3()
         plot(df_counts_normalized, True)

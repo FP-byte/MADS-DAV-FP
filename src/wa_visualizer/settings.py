@@ -15,7 +15,17 @@ class Config:
     author_col: str
     message_length_col: str
     has_emoji_col: str
-    timeformat: str  
+    topic_col: str
+    log_length_col: str
+    age_col: str
+    emoji_status_col: str
+    year_col: str
+    language_col:str
+    hour_col:str
+    date_col:str
+    isoweek_col:str
+    year_week_col:str
+    timeformat: str 
 
 @dataclass
 class BaseStrings:
