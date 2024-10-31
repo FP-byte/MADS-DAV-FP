@@ -27,7 +27,7 @@ class Preprocessor(FileHandler):
     
     def __call__(self):
         self.process()
-        self.save_data(self.folder.datafile)
+        self.save_data()
 
     def has_emoji(self, text):
         """
@@ -47,7 +47,7 @@ class Preprocessor(FileHandler):
                             "]+", flags=re.UNICODE)
 
         return bool(emoji_pattern.search(text))
-
+    @logger.catch
     def find_replace_pattern(self, text:str, pattern:str, replace_str: str='') -> str:
         """_summary_
 
@@ -60,7 +60,7 @@ class Preprocessor(FileHandler):
             str: string edited
         """               
         return re.sub(pattern, replace_str, text)
-
+    @logger.catch
     def clean_message(self, text: str)-> str:
         """
         clean message texts for specific patterns  
@@ -75,7 +75,7 @@ class Preprocessor(FileHandler):
             text = self.find_replace_pattern(text, pattern)
             
         return text.strip()
-
+    @logger.catch
     def delete_system_messages(self, df:pd.DataFrame, author:str)-> pd.DataFrame:
         """
         Delete authomatic system messages under the same author name
@@ -89,7 +89,7 @@ class Preprocessor(FileHandler):
         sys_messages = df[df[self.config.author_col]==author].index
         df.drop(sys_messages, inplace=True, axis=0)
         return df
-    
+    @logger.catch
     def merge_users(self, df:pd.DataFrame, author1:str, author2:str):
         """
         Merge two users which are using aliases, for ex. two different telephones but are the same person
@@ -103,12 +103,12 @@ class Preprocessor(FileHandler):
         return df
 
 
-    
+    @logger.catch
     def clean_data(self):
         """
         Data cleaning
-        """  
-        df = self.data 
+        """
+        df = self.data.copy()
         message = self.config.message_col
         #delete system messages 
         df = self.delete_system_messages(df, 'glittering-penguin')
@@ -120,9 +120,12 @@ class Preprocessor(FileHandler):
         df.drop(empty_messages, axis=0, inplace=True)
         #rerun emoticon detection for missing emoij's
         df[self.config.has_emoji_col] =df[message].apply(self.has_emoji)
+        # update current data
+        self.data = df
+        logger.info('Data cleaned')
         
 
-    
+    @logger.catch
     def detect_language(self, text)-> str:
         """
         Detect language (Italian or Dutch) using stopwords and common words
@@ -144,7 +147,7 @@ class Preprocessor(FileHandler):
         #print(f"guessed_language is {guessed_language}")    
         return guessed_language
                 
-
+    @logger.catch
     def add_communication_type(self)->str:
         """
         Defines communication category (IT, NL or Non-Verbal)
@@ -164,7 +167,7 @@ class Preprocessor(FileHandler):
             else:
                 # detect language 
                 self.data.at[idx, self.config.language_col] = self.detect_language(text)
-
+    @logger.catch
     def process_dates(self)-> None:
         """
         Adds dates information to the dataframe
@@ -172,7 +175,7 @@ class Preprocessor(FileHandler):
         self.data[self.config.date_col] = self.data[self.config.timestamp_col].dt.date
         self.data[self.config.isoweek_col] = self.data[self.config.timestamp_col].dt.isocalendar().week
         self.data[self.config.year_week_col] = self.data[self.config.timestamp_col].dt.strftime("%Y-%W")
-    
+    @logger.catch
     def select_dates(self, df, start_date, end_date):
         if 'date' in df:
             # Select DataFrame rows between two dates
@@ -182,6 +185,7 @@ class Preprocessor(FileHandler):
             logger.info('No date column to select')
             return None
     
+    @logger.catch
     def calc_messages(self, df):
         p = df.groupby("year-week").count()     #group by the isoweeks
         min_ts = df[self.config.timestamp_col].min()
@@ -189,10 +193,11 @@ class Preprocessor(FileHandler):
         new_index = pd.date_range(start=min_ts, end=max_ts, freq='W', name="year-week").strftime('%Y-%W')
         return p.reindex(new_index, fill_value=0)
     
+    @logger.catch
     def calculate_percentage(self, counts, total_counts):
         # Calculate percentages
         return (counts.div(total_counts, axis=0) * 100)
-
+    @logger.catch
     def aggregate_languages(self, data):
         # Grouping by author and language
         user_language_counts = data.groupby(['author', 'language']).size().unstack(fill_value=0)
@@ -212,13 +217,14 @@ class Preprocessor(FileHandler):
         percentages_sorted = percentages.sort_values(by='Verbal', ascending=False)
 
         return percentages_sorted
-    
+
+    @logger.catch
     def preprocess_week1(self):
         print("processing visual 1")
         self.add_communication_type()
         return self.aggregate_languages(self.data)
 
-
+    @logger.catch
     def preprocess_week2(self, startdate='2019-01-01', enddate='2023-01-01'):
         self.process_dates()          
         # select dataset for corona time - start period
@@ -236,44 +242,46 @@ class Preprocessor(FileHandler):
 
         return df_corona, df
 
-    # Function to check for keywords
-    def contains_keywords(self, series, keywords):
-         return series.str.contains('|'.join(keywords), case=False, regex=True)
+    @logger.catch
+    def contains_keywords(self, series:pd.Series, keywords:list[str]):
+        """
+        Checks if keywords are present in a dataframe column
+        Args:
+            series (pd.Series): column with strings
+            keywords (list): list of keywords
 
+        Returns:
+            _type_: _description_
+        """
+        return series.str.contains('|'.join(keywords), case=False, regex=True)
+    
+    @logger.catch
     def filter_by_keywords(self, df, keywords, topic):
         """Filter DataFrame rows based on keywords and assign a topic."""
         df.loc[self.contains_keywords(df[self.config.message_col], keywords), 'topic'] = topic
-        return df[df['topic'] == topic]
+        return df[df[self.config.topic_col] == topic]
 
-
+    @logger.catch
     def preprocess_week3(self):
-        print('preprocess week 3')
+        logger.info('preprocess week 3')
+        filtered_dfs = self.add_topics()
+        df_normalized = self.normalizeTopicCounts(filtered_dfs)
+        return df_normalized
+        
+
+    def add_topics(self)->dict:
+        """
+        Adds topic on the base of keywords
+
+        Returns:
+            (dict): dict of filtered data per topic
+        """        
         df = self.data.copy()
         df[self.config.hour_col] = df[self.config.timestamp_col].dt.hour
-
-        # Define keywords for each category
-        keywords = {
-            'home coming': ['kom', 'naar huis', 'hoe laat', 'hoelaat', 'laat', 'slapen', 'slaap bij', 'donker', 'bed', 'thuis', 'huis', 'terug', 'blijf bij', 'ik ben in','onderweg', 'casa', 'notte', 'nacht', 'sleutel', 'blijven', 'vannacht'],
-            'reizen': [
-                 'hilversum', 'amsterdam', 'reis', 'arrivati', 'aangekomen', 'vertrek', 'ingecheckt'
-                 'dallas', 'spanje', 'mexico', 'bus', 'boot', 'trein',
-                'indonesië', 'hotel', 'florence', 'italie', 'schiphol', 'grado', 'tiare', 'ho chi minh', 
-            ],
-            'food': [
-                r'\beten\b', 'eet', "gegeten", 'blijf eten', 'lunch', 
-                'pizza', 'pasta', 'mangia', 'pranzo', 'cena', 
-                'prosciutto', 'kip', 'latte', 'snack', 
-                'indonesisch', 'kapsalon', 'kps', 'delfino', 
-                'ninh', 'bihn', 'spareribs'
-            ],           
-            
-            #'plans': ['vanavond', 'vandaag', 'morgen', 'afspraak', 'domani', 'stasera', 'ochtend', 'oggi', 'domani'],
-            'people': self.data.author.unique().tolist() + [
-                'papa', 'mama', 'nonno', 'nonna', 'giacomo', 'greta',
-                'opa', 'oma', 'siem', 'tessa', 'ouders', 'mila', 'julia', 'vera'
-            ]
-        }
-
+        keywords = self.strings.topic_keywords
+        #add author names to the people keywords
+        keywords['people'] = self.data.author.unique().tolist() + keywords['people']
+        
         # Initialize an empty dictionary to hold filtered DataFrames
         filtered_dfs = {topic: None for topic in keywords.keys()}
 
@@ -283,37 +291,42 @@ class Preprocessor(FileHandler):
         
         # Remaining rows are classified as 'other'
         # Filter out non verbal messages
-        filtered_dfs['other'] = df[df[self.config.language_col]!='Non-verbal']
+        filtered_dfs['other'] = df
+        
 
         df_all = pd.concat(filtered_dfs.values(), ignore_index=True)
-
+        
         if df_all.shape[0] == self.data.shape[0]:
+            self.data = df_all
             file_topics = self.folders.processed / Path(self.folders.current).stem
-           # self.data.to_csv(f"{file_topics}_with_topics.csv", index=False)
+            df_all.to_csv(f"{file_topics}_with_topics.csv", index=False)
             self.save_data()
         else:
-            print('Could not add topics to data')
+            logger.info('Could not add topics to dataframe')
 
+        return filtered_dfs
+
+    def normalizeTopicCounts(self, filtered_dfs):        
         # Create topics counts
         self.whatsapp_topics = {
-            topic: df['hour'].value_counts().sort_index() for topic, df in filtered_dfs.items() if df is not None
-        }
+                topic: df[self.config.hour_col].value_counts().sort_index() for topic, df in filtered_dfs.items() if df is not None
+            }
 
-        # Create a DataFrame and reindex to ensure all hours are included
+            # Create a DataFrame and reindex to ensure all hours are included
         df_counts = pd.DataFrame({
-            topic.capitalize(): pd.Series(self.whatsapp_topics[topic], name=topic.capitalize())
-            for topic in self.whatsapp_topics.keys()
-        }).fillna(0).reindex(range(24), fill_value=0)
+                topic.capitalize(): pd.Series(self.whatsapp_topics[topic], name=topic.capitalize())
+                for topic in self.whatsapp_topics.keys()
+            }).fillna(0).reindex(range(24), fill_value=0)
 
-        # Calculate total counts for each hour
+            # Calculate total counts for each hour
         df_counts['Total'] = df_counts.sum(axis=1)
 
-        # Normalize each column to percentages
-        df_normalized = df_counts.iloc[:, :-1].div(df_counts['Total'], axis=0) * 100
-
+            # Normalize each column to percentages
+        df_normalized = df_counts.iloc[:, :-1].div(df_counts['Total'], axis=0) * 100    
+        
         return df_normalized
 
-
+    @logger.catch
     def preprocess_week4(self):
         df = self.data.copy()
         # Include age in the features (cleanup stage)
@@ -335,6 +348,7 @@ class Preprocessor(FileHandler):
     
         return avg_log_df
 
+    @logger.catch
     def process(self):
         """
         Data transformation steps needed prior the visualizations

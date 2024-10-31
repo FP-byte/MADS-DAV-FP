@@ -12,7 +12,8 @@ class FileHandler():
         self.data = self.load_data()
         self.config = config
 
-    def load_data(self):       
+    def load_data(self):
+              
         return pd.read_parquet(self.folders.datafile)
 
     def save_data(self) -> None:
@@ -23,8 +24,8 @@ class FileHandler():
         try:
             self.data.to_csv(self.folders.csv, index=False)
             self.data.to_parquet(self.folders.datafile, index=False)
-            print(f"Data processing completed and saved to:")
-            print(f"-{self.folders.datafile}")
-            print(f"-{self.folders.csv}")
+            logger.success(f"Data processing completed and saved to:")
+            logger.success(f"-{self.folders.datafile}")
+            logger.success(f"-{self.folders.csv}")
         except Exception as e:
-            logger.info(f'Problem with saving: {e}')
+            logger.warning(f'Problem with saving: {e}')

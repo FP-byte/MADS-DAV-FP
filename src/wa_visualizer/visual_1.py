@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from wa_visualizer.settings import Config
 from wa_visualizer.basic_plots import BasicPlot
 from wa_visualizer.data_processing import Preprocessor
+from loguru import logger
 
 class BarPlot(BasicPlot):
     def __init__(self, config: Config, title_fig: str, ylabel: str, xlabel: str, filename: str, legend_title: str = ""):

@@ -41,7 +41,7 @@ class BasicPlot:
         self.color = self.config.basic_color
         self.color_highlight = self.config.basic_color_highlight
         #set gray scala colors as default
-        self.custom_colors = self.config.basic_palette 
+        self.custom_colors = self.config.color_palette 
     
     def plot(self, data: pd.DataFrame):
         #to define for each plot
@@ -56,11 +56,12 @@ class BasicPlot:
             plt.legend(title=self.legend_title, bbox_to_anchor=(1.0, 1), loc='upper left')
         plt.show()
         plt.close()  # Close the figure to free up memory
-
+        
+    @logger.catch
     def save(self):
         filepath = self.config.img_dir / Path(self.filename)
         plt.savefig(filepath, bbox_inches='tight', transparent=False)
-        print(f"Plot saved to: {filepath}")
+        logger.success(f"Plot saved to: {filepath}")
         
 
 class BarPlot(BasicPlot):

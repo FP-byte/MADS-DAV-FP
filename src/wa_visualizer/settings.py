@@ -27,7 +27,7 @@ class Config:
     year_week_col:str
     timeformat: str 
     basic_color: str
-    basic_palette: list
+    color_palette: list
     basic_color_highlight: str
     color_vertical_line: str
 
@@ -38,6 +38,7 @@ class BaseStrings:
     dutch_frequentwords : list
     italian_frequentwords : list
     dob_mapping : dict
+    topic_keywords: dict
  
 @dataclass
 class Folders:

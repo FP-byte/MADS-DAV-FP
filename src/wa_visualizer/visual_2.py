@@ -6,6 +6,7 @@ from pathlib import Path
 from wa_visualizer.settings import Config
 from wa_visualizer.basic_plots import (BasicScatterPlot, VerticalLine, MovingAverageLinePlot)
 from wa_visualizer.data_processing import Preprocessor
+from loguru import logger
 
 class TimeSeriesPlot(BasicScatterPlot):
     color:str

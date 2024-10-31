@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from wa_visualizer.settings import Config
 from wa_visualizer.basic_plots import BasicPlot
 from wa_visualizer.data_processing import Preprocessor
+from loguru import logger
 
 class FacetGridPlot(BasicPlot):
     """
@@ -46,7 +47,8 @@ class FacetGridPlot(BasicPlot):
 
         # Adjust layout to avoid overlap with the main title
         plt.subplots_adjust(top=0.85)
-        # Seve the plot
+
+        # Save the plot
         self.save()
 
         # Finally, show the plot

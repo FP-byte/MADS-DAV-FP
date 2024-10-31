@@ -14,7 +14,7 @@ from wa_visualizer.filehandler import FileHandler
 from wa_visualizer.visual_1 import BarPlotVisualizer
 from wa_visualizer.visual_2 import TimeSeriesPlotVisualizer
 from wa_visualizer.visual_4 import RelationshipsPlotVisualizer
-from loguru import logger
+import sys
 
 
 @click.command()
@@ -67,7 +67,7 @@ def main(week, all):
         year_week_col = 'year-week',
         timeformat= "%Y-%m-%d",
         basic_color= 'gray',
-        basic_palette= ['salmon', 'gray', '#444', 'darkgray', '#EEE',"lightgray"],
+        color_palette= ['salmon', 'gray', '#444', 'darkgray', '#EEE',"lightgray"],
         basic_color_highlight = 'salmon',
         color_vertical_line = '#EEE'
     )
@@ -87,12 +87,37 @@ def main(week, all):
             dutch_frequentwords = ['dankjewel', 'toch', 'sowieso', 'dank', 'hoi','ok', 'oké', 'okay', 'top', 'huh','omg', 'lol', 'yeah', 'leuk', 'hoor', 'gezellig','turks', 'goed', 'mama', 'papa', 'mooi', 'straks', 'gefeliciteeeeeerd', 'gefeliciteerd','even', 'ga', 'natuurlijk', 'hè', 'zoek', 'pfff', 'wow', 'wowowow', 'wowowowowow'],
             italian_frequentwords  = ['grazie', 'ciao', 'pizza', 'buon', 'nonni', 'nonno', 'nonna', 'dentro', 'essere',  'uffa', 'eh', 'immagino'],
             dob_mapping = {'effervescent-camel': 2002, 'nimble-wombat':1971, 'hilarious-goldfinch':1972,
-                    'spangled-rabbit':2004}
+                    'spangled-rabbit':2004},
+            # Define keywords for each category
+            topic_keywords = {
+                'home coming': ['kom', 'naar huis', 'hoe laat', 'hoelaat', 'laat', 'slapen', 'slaap bij', 'donker', 'bed', 'thuis', 'huis', 'terug', 'blijf bij', 'ik ben in','onderweg', 'casa', 'notte', 'nacht', 'sleutel', 'blijven', 'vannacht'],
+                'reizen': [
+                    'hilversum', 'amsterdam', 'reis', 'arrivati', 'aangekomen', 'vertrek', 'ingecheckt'
+                    'dallas', 'spanje', 'mexico', 'bus', 'boot', 'trein',
+                    'indonesië', 'hotel', 'florence', 'italie', 'schiphol', 'grado', 'tiare', 'ho chi minh', 
+                ],
+                'food': [
+                    r'\beten\b', 'eet', "gegeten", 'blijf eten', 'lunch', 
+                    'pizza', 'pasta', 'mangia', 'pranzo', 'cena', 
+                    'prosciutto', 'kip', 'latte', 'snack', 
+                    'indonesisch', 'kapsalon', 'kps', 'delfino', 
+                    'ninh', 'bihn', 'spareribs'
+                ],           
+                
+                #'plans': ['vanavond', 'vandaag', 'morgen', 'afspraak', 'domani', 'stasera', 'ochtend', 'oggi', 'domani'],
+                'people': [
+                    'papa', 'mama', 'nonno', 'nonna', 'giacomo', 'greta',
+                    'opa', 'oma', 'siem', 'tessa', 'ouders', 'mila', 'julia', 'vera'
+                ]
+            }
         )
         preprocessor = Preprocessor(folders, regexes, config, strings)
+        preprocessor()
+        logger.remove()
+        logger.add("logs/logfile.log", rotation="1 week", level="DEBUG")
+        logger.add(sys.stderr, level="INFO")
         bar_plot_visualizer = False
-        #clean data
-        preprocessor.process()
+
 
         if week.lower()=="1" or all:
             print("visualize plot for week 1")
