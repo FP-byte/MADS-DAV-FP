@@ -29,25 +29,26 @@ De data is vervolgens bewerkt door de volgende extra stappen uit te voeren:
 - alle autheur en emailadressen zijn uit de berichten verwijderd 
 - twee autheur zijn samengevoegd (dezelfde gebruiker kreeg een ander nummer)
 - de berichten van een autheur is verwijderd (ging om sturen van systeem berichten)
+- emoji-detectie verbeterd (zijn ontbrekende sets van ASCII-codes toegevoegd)
   
 Voor elke visualisatie is verder een preprocessing-stap ingebouwd om de visualisatie mogelijk te maken:
-### Visualisatie 1
+### Preprocessing visualisatie 1
 Non-verbale data is gefilterd op basis van media-inhoud, berichten met uitsluitend emoji's en gedeelde URL’s.
 De verbale data is verder ingedeeld per taal, er worden twee talen gebruikt, Italiaans en Nederlands, wat verder ook nuttig was voor het bepalen van de meest voorkomende termen.
-### Visualisatie 2
+### Preprocessing visualisatie 2
 De te visualiseren berichten zijn geselecteerd voor een kleinere tijdsframe rondom de corona-periode en erna om effectievere visualisatie te realiseren.
-### Visualisatie 3
+### Preprocessing visualisatie 3
 De berichten zijn gefilterd op basis van zoektermen, geselecteerd op basis van veelvoorkomende woorden in de dataset in beide talen. Vervolgens is er handmatig een lijst samengesteld van betekenisvolle termen en zijn deze in een verzamelcategorie ondergebracht. 
-### Visualisatie 4
-In de dataset is een leeftijdskolom toegevoegd op basis van geboortejaar van de auteurs. Bovendien zijn de patronen voor emoji-detectie verbeterd en zijn ontbrekende sets van ASCII-codes toegevoegd aan de regex die tijdens de cleanup werd gebruikt.
-
-### Visualisatie 5
+### Preprocessing visualisatie 4
+In de dataset is een leeftijdskolom toegevoegd op basis van geboortejaar van de auteurs. Bovendien zijn de regex patronen voor emoji-detectie en verwijderen van gebruikers toegevoegd aan de regex die tijdens de cleanup werd gebruikt.
+### Preprocessing visualisatie 5
+To do
 
 <div class="page"/>
 
+### Visualisatie 1: Tekst overwinning: Een Foto Vervangt Geen Woorden
 ![Tekst overwinning](../img/1_categories_visualization.png)
 
-### Visualisatie 1: Tekst overwinning: Een Foto Vervangt Geen Woorden
 De categorievisualisatie biedt een eerste blik op de dataset, waarin verbale en non-verbale communicatie met elkaar worden vergeleken. Deze visualisatie is een belangrijke stap in het blootleggen van communicatiepatronen binnen de dataset: het toont een samenvatting van variaties in communicatiestijlen per gebruiker. Wie stuurt de meeste of de minste foto's en emoji's? Wie schrijft het meest?
 De titel benadrukt een cruciale eigenschap van de data: de chat is duidelijk niet gericht op het delen van media-inhoud, maar het is waarschijnlijk zeer functioneel. Dit is niet verrassend: tieners delen liever geen foto's met hun ouders!
 
@@ -58,9 +59,10 @@ De gegroepeerde plaatsing van de balken per auteur (proximity) stelt de kijker i
 
 <div class="page"/>
 
+### Visualisatie 2: Digital stilte in tijden van lockdown: van pixel naar persoonlijk
+
 ![Digital stilte in tijden van lockdown](../img/2_timeseries_visualization.png)
 
-### Visualisatie 2: Digital stilte in tijden van lockdown: van pixel naar persoonlijk
 Deze timeseries-visualisatie is een overzicht van een periode tussen november 2019 en begin 2023. De periode is ruim genoeg genomen om voldoende vergelijkingsmateriaal te bieden en tijdsgebonden verandering te tonen. De titel maakt de boodschap duidelijk, er wordt niets gedeeld in de chat tijdens de lockdown periodes, er is ook weinig te vertellen. Iedereen is thuis, de communicatie gaat dan vaker persoonlijk en niet digitaal.
 
 ## Visuele kenmerken
@@ -73,7 +75,7 @@ De visualisatie maakt ook gebruik van proximity, similarity en enclosure om visu
 
 ![Kom je naar huis?](../img/3_distribution_visualization.png)
 
-Deze distributie-visualisatie biedt een analyse van verschillende gezinsgerelateerde onderwerpen en bouwt op de eerder categorisatie van verbaal en niet-verbale communicatie. Hier wordt vooral gezocht naar de onderwerpen van de berichten, aangezin de grootste gedeelte is van de data. Tijdens de analyse viel op hoe vaak er werd gesproken over eten en de locaties van gezinsleden. Vooral de nachtelijke berichten kwamen naar voren als opmerkelijke interacties. Deze chats zijn typisch van een bepaalde periode in het leven van tieners en hun ouders. Ouders die met tieners omgaan, moeten steeds subtiel op hun kinderen letten en grenzen stellen. De visualisatie toont hoeveel ouders ermee bezig zijn!
+Deze distributie-visualisatie biedt een analyse van verschillende gezinsgerelateerde onderwerpen en bouwt voort op de eerdere categorisatie van verbale en non-verbale communicatie. De focus ligt vooral op de onderwerpen van de berichten, aangezien dit het grootste deel van de data uitmaakt. Tijdens de analyse viel op hoe vaak er werd gesproken over eten en de locaties van gezinsleden die op reis waren. Vooral de nachtelijke berichten kwamen naar voren als opmerkelijke interacties. Deze chats zijn kenmerkend voor een bepaalde fase in het leven van tieners en hun ouders. Ouders die met tieners omgaan, moeten voortdurend subtiel op hun kinderen letten en grenzen stellen. De visualisatie laat zien hoeveel ouders hiermee bezig zijn!
 
 ## Visuele kenmerken
 De preattemptive processing is gerealiseerd door het gebruik van opvallende kleuren voor het hoofdthema ('Kom je naar huis'), dat betrekking heeft op de nachtelijke gesprekken. De andere thema's zijn weergegeven in grijstinten om te benadrukken dat er meerdere onderwerpen worden besproken en dat dit een exploratie ervan is. De visualisatie toont de volledige dataset, inclusief non-verbale berichten onder de overige categorie, vandaar deze de meeste berichten inhoud en de meeste lichte grijstint heeft.
