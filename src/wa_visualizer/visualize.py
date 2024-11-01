@@ -101,12 +101,12 @@ def main(week, all):
                     'pizza', 'pasta', 'mangia', 'pranzo', 'cena', 
                     'prosciutto', 'kip', 'latte', 'snack', 
                     'indonesisch', 'kapsalon', 'kps', 'delfino', 
-                    'ninh', 'bihn', 'spareribs'
+                    'ninh', 'bihn', 'spareribs', 'vis', 'restaurant'
                 ],           
                 
                 #'plans': ['vanavond', 'vandaag', 'morgen', 'afspraak', 'domani', 'stasera', 'ochtend', 'oggi', 'domani'],
                 'people': [
-                    'papa', 'mama', 'nonno', 'nonna', 'giacomo', 'greta',
+                    'papa', 'mama', 'nonno', 'nonna', 'giacomo', 'greta','nonni',
                     'opa', 'oma', 'siem', 'tessa', 'ouders', 'mila', 'julia', 'vera'
                 ]
             }

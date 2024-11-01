@@ -29,7 +29,7 @@ class BasicPlot:
     save(): Saves the plot to the specified filename.
     plot(data, *args, **kwargs): Defines how to create the plot, empty in the basicPlot class.
     """    
-    def __init__(self, config: Config, title_fig: str, xlabel: str, ylabel: str, filename: str, figsize=(12, 8), show_legend: bool = True, legend_title:str=""):
+    def __init__(self, config: Config, title_fig: str, xlabel: str, ylabel: str, filename: str, figsize=(10, 5), show_legend: bool = True, legend_title:str=""):
         self.config = config
         self.title_fig = title_fig
         self.xlabel = xlabel
@@ -48,6 +48,7 @@ class BasicPlot:
         pass
 
     def show_plot(self):
+        print(self.title_fig)
         plt.title(self.title_fig)
         plt.xlabel(self.xlabel)
         plt.ylabel(self.ylabel)
@@ -56,7 +57,7 @@ class BasicPlot:
             plt.legend(title=self.legend_title, bbox_to_anchor=(1.0, 1), loc='upper left')
         plt.show()
         plt.close()  # Close the figure to free up memory
-        
+
     @logger.catch
     def save(self):
         filepath = self.config.img_dir / Path(self.filename)

@@ -29,6 +29,8 @@ class Preprocessor(FileHandler):
         self.process()
         self.save_data()
 
+    #******** hulpmethoden *******************
+
     def has_emoji(self, text):
         """
         Detect emoijs not in yet included
@@ -101,52 +103,6 @@ class Preprocessor(FileHandler):
         """        
         df.loc[df[self.config.author_col]==author2, 'author'] = author1
         return df
-
-
-    @logger.catch
-    def clean_data(self):
-        """
-        Data cleaning
-        """
-        df = self.data.copy()
-        message = self.config.message_col
-        #delete system messages 
-        df = self.delete_system_messages(df, 'glittering-penguin')
-        #merging two users 
-        df = self.merge_users(df, 'effervescent-camel','funny-bouncing')  
-        # remove messages with regex
-        df[message] = df[message].apply(self.clean_message)
-        empty_messages = df[df[message]==""].index
-        df.drop(empty_messages, axis=0, inplace=True)
-        #rerun emoticon detection for missing emoij's
-        df[self.config.has_emoji_col] =df[message].apply(self.has_emoji)
-        # update current data
-        self.data = df
-        logger.info('Data cleaned')
-        
-
-    @logger.catch
-    def detect_language(self, text)-> str:
-        """
-        Detect language (Italian or Dutch) using stopwords and common words
-
-        Args:
-            text (str): string in a language
-
-        Returns:
-            str: guessed language
-        """               
-
-        guessed_language= "NL"
-        for word in text:       
-            if word in self.strings.dutch_stopwords+self.strings.dutch_frequentwords:
-                guessed_language = "NL"
-                        
-            if word in self.strings.italian_stopwords+self.strings.italian_frequentwords:
-                guessed_language = "IT"
-        #print(f"guessed_language is {guessed_language}")    
-        return guessed_language
-                
     @logger.catch
     def add_communication_type(self)->str:
         """
@@ -184,7 +140,6 @@ class Preprocessor(FileHandler):
         else:
             logger.info('No date column to select')
             return None
-    
     @logger.catch
     def calc_messages(self, df):
         p = df.groupby("year-week").count()     #group by the isoweeks
@@ -217,30 +172,27 @@ class Preprocessor(FileHandler):
         percentages_sorted = percentages.sort_values(by='Verbal', ascending=False)
 
         return percentages_sorted
-
     @logger.catch
-    def preprocess_week1(self):
-        print("processing visual 1")
-        self.add_communication_type()
-        return self.aggregate_languages(self.data)
+    def detect_language(self, text)-> str:
+        """
+        Detect language (Italian or Dutch) using stopwords and common words
 
-    @logger.catch
-    def preprocess_week2(self, startdate='2019-01-01', enddate='2023-01-01'):
-        self.process_dates()          
-        # select dataset for corona time - start period
-        start_date = datetime.datetime.strptime(startdate, self.config.timeformat).date()
-        # end corona period
-        end_date = datetime.datetime.strptime(enddate, self.config.timeformat).date()
-        df = self.select_dates(self.data, start_date, end_date)
+        Args:
+            text (str): string in a language
 
-        # select corona data - start first lockdown
-        start_date = datetime.datetime.strptime('2020-03-09', self.config.timeformat).date()
-        # second lockdown
-        end_date = datetime.datetime.strptime('2021-01-15', self.config.timeformat).date()
+        Returns:
+            str: guessed language
+        """               
 
-        df_corona = self.select_dates(self.data, start_date, end_date)
-
-        return df_corona, df
+        guessed_language= "NL"
+        for word in text:       
+            if word in self.strings.dutch_stopwords+self.strings.dutch_frequentwords:
+                guessed_language = "NL"
+                        
+            if word in self.strings.italian_stopwords+self.strings.italian_frequentwords:
+                guessed_language = "IT"
+        #print(f"guessed_language is {guessed_language}")    
+        return guessed_language
 
     @logger.catch
     def contains_keywords(self, series:pd.Series, keywords:list[str]):
@@ -260,14 +212,6 @@ class Preprocessor(FileHandler):
         """Filter DataFrame rows based on keywords and assign a topic."""
         df.loc[self.contains_keywords(df[self.config.message_col], keywords), 'topic'] = topic
         return df[df[self.config.topic_col] == topic]
-
-    @logger.catch
-    def preprocess_week3(self):
-        logger.info('preprocess week 3')
-        filtered_dfs = self.add_topics()
-        df_normalized = self.normalizeTopicCounts(filtered_dfs)
-        return df_normalized
-        
 
     def add_topics(self)->dict:
         """
@@ -292,8 +236,6 @@ class Preprocessor(FileHandler):
         # Remaining rows are classified as 'other'
         # Filter out non verbal messages
         filtered_dfs['other'] = df
-        
-
         df_all = pd.concat(filtered_dfs.values(), ignore_index=True)
         
         if df_all.shape[0] == self.data.shape[0]:
@@ -325,28 +267,29 @@ class Preprocessor(FileHandler):
         df_normalized = df_counts.iloc[:, :-1].div(df_counts['Total'], axis=0) * 100    
         
         return df_normalized
-
+              
+   
+    #***************** data cleaning steps ***********************
     @logger.catch
-    def preprocess_week4(self):
+    def clean_data(self):
+        """
+        Data cleaning
+        """
         df = self.data.copy()
-        # Include age in the features (cleanup stage)
-        df[self.config.year_col] = df[self.config.timestamp_col].dt.year  # Extract year from datetime
-        df['dob'] = df[self.config.author_col].map(self.strings.dob_mapping)
-        df[self.config.age_col] = df[self.config.year_col] - df['dob']
-        df.drop(['dob'], inplace=True, axis=1)
-        print(df.columns)
-        df[self.config.message_length_col] = df[self.config.message_col].str.len()
-
-        # Calculate the logarithm of message length
-        df[self.config.log_length_col] = df[self.config.message_length_col].apply(lambda x: np.log(x) if x > 0 else 0)  # Handle log(0)
-
-        # Create a new column to categorize messages based on emoji presence
-        df[self.config.emoji_status_col] = df[self.config.has_emoji_col].apply(lambda x: 'With Emoji' if x > 0 else 'Without Emoji')
-
-        # Calculate the average log length per age
-        avg_log_df = df.groupby([self.config.age_col, self.config.emoji_status_col])[self.config.log_length_col].mean().reset_index()
-    
-        return avg_log_df
+        message = self.config.message_col
+        #delete system messages 
+        df = self.delete_system_messages(df, 'glittering-penguin')
+        #merging two users 
+        df = self.merge_users(df, 'effervescent-camel','funny-bouncing')  
+        # remove messages with regex
+        df[message] = df[message].apply(self.clean_message)
+        empty_messages = df[df[message]==""].index
+        df.drop(empty_messages, axis=0, inplace=True)
+        #rerun emoticon detection for missing emoij's
+        df[self.config.has_emoji_col] =df[message].apply(self.has_emoji)
+        # update current data
+        self.data = df
+        logger.info('Data cleaned')
 
     @logger.catch
     def process(self):
@@ -360,5 +303,59 @@ class Preprocessor(FileHandler):
         self.process_dates()
         #save preprocessed data
         self.save_data()
+        
+    #***************** preprocessing functions for each visualization ***********************
+    @logger.catch
+    def preprocess_week1(self):
+        print("processing visual 1")
+        self.add_communication_type()
+        return self.aggregate_languages(self.data)
+
+    @logger.catch
+    def preprocess_week2(self, startdate='2019-01-01', enddate='2023-01-01'):
+        self.process_dates()          
+        # select dataset for corona time - start period
+        start_date = datetime.datetime.strptime(startdate, self.config.timeformat).date()
+        # end corona period
+        end_date = datetime.datetime.strptime(enddate, self.config.timeformat).date()
+        df = self.select_dates(self.data, start_date, end_date)
+
+        # select corona data - start first lockdown
+        start_date = datetime.datetime.strptime('2020-03-09', self.config.timeformat).date()
+        # second lockdown
+        end_date = datetime.datetime.strptime('2021-01-15', self.config.timeformat).date()
+
+        df_corona = self.select_dates(self.data, start_date, end_date)
+
+        return df_corona, df
+    @logger.catch
+    def preprocess_week3(self):
+        logger.info('preprocess week 3')
+        filtered_dfs = self.add_topics()
+        df_normalized = self.normalizeTopicCounts(filtered_dfs)
+        return df_normalized
+        
+    @logger.catch
+    def preprocess_week4(self):
+        df = self.data.copy()
+        #extract year column
+        df[self.config.year_col] = df[self.config.timestamp_col].dt.year  # Extract year from datetime
+        df['dob'] = df[self.config.author_col].map(self.strings.dob_mapping)
+        # Include age in the features 
+        df[self.config.age_col] = df[self.config.year_col] - df['dob']
+        df.drop(['dob'], inplace=True, axis=1)
+        #add message length colum
+        df[self.config.message_length_col] = df[self.config.message_col].str.len()
+
+        # Calculate the logarithm of message length
+        df[self.config.log_length_col] = df[self.config.message_length_col].apply(lambda x: np.log(x) if x > 0 else 0)  # Handle log(0)
+
+        # Create a new column to categorize messages based on emoji presence
+        df[self.config.emoji_status_col] = df[self.config.has_emoji_col].apply(lambda x: 'With Emoji' if x > 0 else 'Without Emoji')
+
+        # Calculate the average log length per age
+        avg_log_df = df.groupby([self.config.age_col, self.config.emoji_status_col])[self.config.log_length_col].mean().reset_index()
+    
+        return avg_log_df
 
 

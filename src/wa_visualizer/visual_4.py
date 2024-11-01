@@ -83,7 +83,8 @@ class RelationshipsPlotVisualizer(Preprocessor):
     def visualization_week4(self):
         plot = FacetGridPlot(
             config=self.config,
-            title_fig="Getting Slower Fingers with Age: Adults Save (Typing) Time with Emojis",
+           # title_fig="Getting Slower Fingers with Age: Adults Save (Typing) Time with Emojis",
+            title_fig = "Langzame Vingers in een Snelle Wereld: Volwassenen en hun Emoji-Tijdwinst",
             xlabel='Author Age',
             ylabel='Average Log of Message Length',
             filename='4_relationships_visualization.png',

@@ -25,12 +25,12 @@ class BarPlot(BasicPlot):
         # Plotting
         ax = data.plot(kind='bar', stacked=stacked, figsize=(10, 8), color=self.custom_colors)
         # Annotate each bar with the percentage
-        if not stacked:
-            for p in ax.patches:
-                ax.annotate(f'{p.get_height():.1f}%', 
-                                    (p.get_x() + p.get_width() / 2, p.get_height()), 
-                                    ha='center', va='bottom', 
-                                    fontsize=10)
+        # if not stacked:
+        #     for p in ax.patches:
+        #         ax.annotate(f'{p.get_height():.1f}%', 
+        #                             (p.get_x() + p.get_width() / 2, p.get_height()), 
+        #                             ha='center', va='bottom', 
+        #                             fontsize=10)
 
         plt.title(self.title_fig)
         plt.ylabel(self.ylabel)
@@ -52,9 +52,9 @@ class BarPlotVisualizer(Preprocessor):
 
     def visualization_week1(self):
         plot = BarPlot(
-            title_fig="A Picture Isn't Worth a Thousand Words",
-            ylabel="Percentage",
-            xlabel="Author",
+            title_fig="Tekst overwinning: Een Foto is Geen Duizend Woorden Waard",
+            ylabel="Percentage van berichten",
+            xlabel="Auteur",
             filename="1_categories_visualization.png",
             config=self.config
         )
@@ -64,12 +64,13 @@ class BarPlotVisualizer(Preprocessor):
 
     def visualization_week3(self):
         plot = BarPlot(
-            title_fig="Are you Coming Home? Late-Night WhatsApp Chats with Teens",
-            ylabel="Percentage of Total Messages",
+            title_fig="Kom je naar huis? Tiener appjes van 's ochtens vroeg tot Diep in de Nacht",
+            #Kom naar huis! Diep in de nacht Chats met pubers
+            ylabel="% van Totaal berichten",
             xlabel="Hour of the Day",
             filename="3_distribution_visualization.png",
             config=self.config,
-            legend_title='Topics',
+            legend_title='Onderwerpen',
 
         )
         plot.custom_colors = self.config.color_palette

@@ -19,6 +19,7 @@ notebooks/*
 checklist.md
 *.toml
 src/wa_analyzer/*
-
-
 data/cleaned/*
+reports/.pdf
+img/figure1.png
+reports/project_whatsapp_visualisatie.pdf

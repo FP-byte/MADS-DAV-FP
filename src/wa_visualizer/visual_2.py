@@ -23,6 +23,7 @@ class TimeSeriesPlot(BasicScatterPlot):
 
     def create_plot(self, p: pd.DataFrame, p_corona: pd.DataFrame):
         _, ax = plt.subplots(figsize=(12, 6))
+        plt.title(self.title_fig)
 
         # Scatter plots using Seaborn
         self.plot(p.index, p[self.config.timestamp_col], ax=ax, color = self.color )
@@ -53,9 +54,7 @@ class TimeSeriesPlot(BasicScatterPlot):
         filename = self.config.img_dir / Path(self.filename)
         #plt.savefig(filename, bbox_inches='tight', transparent=False)
         self.save()
-
         self.show_plot()  # Show the plot with the legend setting
-        plt.close()
 
 
 class TimeSeriesPlotVisualizer(Preprocessor):
@@ -76,7 +75,7 @@ class TimeSeriesPlotVisualizer(Preprocessor):
     def visualization_week2(self):
         """Creates a time series plot for week 2 data."""
         plot = TimeSeriesPlot(
-            title_fig="Digital Silence: The WhatsApp Whisper During Lockdown",
+            title_fig="Digitale stilte in tijden van lockdown",
             xlabel="Date: year-week",
             ylabel="Number of messages",
             filename="2_timeseries_visualization.png",
