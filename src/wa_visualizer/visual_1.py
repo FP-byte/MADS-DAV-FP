@@ -53,7 +53,7 @@ class BarPlotVisualizer(Preprocessor):
     def visualization_week1(self):
         plot = BarPlot(
             title_fig="Tekst overwinning: Een Foto is Geen Duizend Woorden Waard",
-            ylabel="Percentage van berichten",
+            ylabel="% van berichten",
             xlabel="Auteur",
             filename="1_categories_visualization.png",
             config=self.config
@@ -67,7 +67,7 @@ class BarPlotVisualizer(Preprocessor):
             title_fig="Kom je naar huis? Tiener appjes van 's ochtens vroeg tot Diep in de Nacht",
             #Kom naar huis! Diep in de nacht Chats met pubers
             ylabel="% van Totaal berichten",
-            xlabel="Hour of the Day",
+            xlabel="Uur van de dag",
             filename="3_distribution_visualization.png",
             config=self.config,
             legend_title='Onderwerpen',

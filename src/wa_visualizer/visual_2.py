@@ -49,12 +49,13 @@ class TimeSeriesPlot(BasicScatterPlot):
         ax.set_xticks(xticks)
         ax.set_xticklabels(xticks, rotation=45, ha='right')
 
-
+        
         # Save the plot
         filename = self.config.img_dir / Path(self.filename)
         #plt.savefig(filename, bbox_inches='tight', transparent=False)
         self.save()
         self.show_plot()  # Show the plot with the legend setting
+        
 
 
 class TimeSeriesPlotVisualizer(Preprocessor):
@@ -76,8 +77,8 @@ class TimeSeriesPlotVisualizer(Preprocessor):
         """Creates a time series plot for week 2 data."""
         plot = TimeSeriesPlot(
             title_fig="Digitale stilte in tijden van lockdown",
-            xlabel="Date: year-week",
-            ylabel="Number of messages",
+            xlabel="Datum: jaar-week",
+            ylabel="Aantal berichten",
             filename="2_timeseries_visualization.png",
             show_legend=False,  # do not show legend in this plot
             config=self.config

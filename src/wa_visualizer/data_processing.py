@@ -4,7 +4,7 @@ import datetime
 from loguru import logger
 import pandas as pd
 import numpy as np
-from wa_visualizer.settings import (BaseRegexes, Folders, Config, BaseStrings)
+from wa_visualizer.settings import (BaseRegexes, Folders, Config, BaseStrings, keywordsFilter, extraRegexes, basicConfig)
 from wa_visualizer.filehandler import FileHandler
 
 class Preprocessor(FileHandler):
@@ -24,6 +24,8 @@ class Preprocessor(FileHandler):
         self.regexes = regexes
         self.config = config
         self.strings = strings
+        # define dob for this dataset
+        self.dob_mapping = {'effervescent-camel': 2002, 'nimble-wombat':1971, 'hilarious-goldfinch':1972, 'spangled-rabbit':2004}
     
     def __call__(self):
         self.process()
@@ -340,7 +342,8 @@ class Preprocessor(FileHandler):
         df = self.data.copy()
         #extract year column
         df[self.config.year_col] = df[self.config.timestamp_col].dt.year  # Extract year from datetime
-        df['dob'] = df[self.config.author_col].map(self.strings.dob_mapping)
+        #dob assignment             
+        df['dob'] = df[self.config.author_col].map(self.dob_mapping)
         # Include age in the features 
         df[self.config.age_col] = df[self.config.year_col] - df['dob']
         df.drop(['dob'], inplace=True, axis=1)

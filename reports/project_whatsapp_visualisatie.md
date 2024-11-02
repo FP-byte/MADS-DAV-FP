@@ -71,7 +71,7 @@ De visualisatie maakt ook gebruik van proximity, similarity en enclosure om visu
 
 <div class="page"/>
 
-### Visualisatie 3: Kom je naar huis? Tiener-appjes tot diep in de nacht
+### Visualisatie 3: Kom je naar huis? Tiener appjes van 's ochtens vroeg tot Diep in de Nacht
 
 ![Kom je naar huis?](../img/3_distribution_visualization.png)
 
