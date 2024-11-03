@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 from wa_visualizer.filehandler import FileHandler
-from wa_visualizer.data_processing import Preprocessor
 import pandas as pd
 from wa_visualizer.settings import Config
 from pathlib import Path
 from loguru import logger
 import seaborn as sns
+
 
 class BasicPlot:
     """
@@ -44,10 +44,13 @@ class BasicPlot:
         self.custom_colors = self.config.color_palette 
     
     def plot(self, data: pd.DataFrame):
-        #to define for each plot
+        #to be defined for each plot
         pass
 
     def show_plot(self):
+        """
+        Shows the plot
+        """        
         print(self.title_fig)
         plt.title(self.title_fig)
         plt.xlabel(self.xlabel)
@@ -60,6 +63,9 @@ class BasicPlot:
 
     @logger.catch
     def save(self):
+        """
+        Saves the plot to img folder with given filename
+        """        
         filepath = self.config.img_dir / Path(self.filename)
         plt.savefig(filepath, bbox_inches='tight', transparent=False)
         logger.success(f"Plot saved to: {filepath}")
@@ -287,3 +293,5 @@ class MovingAverageLinePlot:
         """        
         self.data["moving_avg"] = self.data[self.timestamp_col].rolling(window=1).mean()
         sns.lineplot(data=self.data, x=self.data.index, y="moving_avg", ax=ax, color=self.color)
+
+

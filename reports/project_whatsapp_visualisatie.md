@@ -1,6 +1,6 @@
 # Data Analysis & Visualization: Rapport
 
-![Whatsapp Visualization](../img/figure1.png)
+![Whatsapp Visualization](../img/voorkant_whatappdata_analysis.jpg)
 
 
 ***Naam: Francesca Paulin Tumburus***
@@ -42,7 +42,7 @@ De berichten zijn gefilterd op basis van zoektermen, geselecteerd op basis van v
 ### Preprocessing visualisatie 4
 In de dataset is een leeftijdskolom toegevoegd op basis van geboortejaar van de auteurs. Bovendien zijn de regex patronen voor emoji-detectie en verwijderen van gebruikers toegevoegd aan de regex die tijdens de cleanup werd gebruikt.
 ### Preprocessing visualisatie 5
-To do
+The processing step maakt gebruik van de data geleverd in de eerdere visualisatie en wordt gebruik gemaakt van embedding class en dimensie-reductie t-SNE om de basisdata voor de visualisatie te realiseren.
 
 <div class="page"/>
 
@@ -91,5 +91,15 @@ De relaties visualisatie toont een bijzonder verschil. Berichten met emoij's zij
 De preattemptive processing maakt gebruik van kleurverschillen in twee naast elkaar getoonde visualisaties (face grid). De lijn is het visuele kenmerk dat als eerste wordt opgemerkt en het verhaal vertelt, terwijl het ook een gevoel van continuïteit biedt. Daarnaast wordt er gebruikgemaakt van similarity en proximity concepten: de data is geaggregeerd op basis van emoji-gebruik en dit wordt weergegeven in een gegroepeerd formaat met grote bolletjes.
 
 <div class="page"/>
-### Visualisatie 5: dimension reducing
+
+### Visualisatie 5: dimension reduction
+
+![Onderwerpen zijn belangrijk](../img/5_tsne_topics_visualization.png)
+De onderwerpen vormen een duidelijk patroon. Bij het toepassen van dimensiereductie met t-SNE komen deze onderwerpen goed naar voren. Vooral de thema's rondom voedsel en eerdere berichten met het verzoek om naar huis te komen zijn samengevoegd in herkenbare clusters.
+
+Als we ook de verdeling van talen in dezelfde dataset bekijken, valt op dat de kluster in het oranje is zowel per taal als per onderwerp zeer specifiek: de conversaties gaan over vakanties in Italie en in het Italiaas. 
+
+![Talenknobbels](../img/5_tsne_language_visualization.png)
+
+De preattentieve verwerking maakt gebruik van kleurverschillen om de verschillende onderwerpen en talen te visualiseren. Proximity en similarity worden weergegeven door datapunten dicht bij elkaar te tekenen. Elke coördinaat in t-SNE vertegenwoordigt een afstand in gelijkenis qua betekenis.
 

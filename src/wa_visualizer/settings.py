@@ -1,14 +1,47 @@
 from pydantic import BaseModel
 from dataclasses import dataclass
 from pathlib import Path
+import numpy as np
 
 @dataclass
 class BaseRegexes:
-    patterns : dict
+    """
+    A class to hold regex patterns.
+
+    Attributes:
+        patterns (dict): A dictionary of regex patterns.
+    """
+    patterns: dict
 
 
 @dataclass
 class Config:
+    """
+    A class to hold configuration settings for data processing.
+
+    Attributes:
+        img_dir (Path): Path to the directory containing images.
+        timestamp_col (str): Name of the column for timestamps.
+        message_col (str): Name of the column for messages.
+        author_col (str): Name of the column for authors.
+        message_length_col (str): Name of the column for message lengths.
+        has_emoji_col (str): Name of the column indicating emoji presence.
+        topic_col (str): Name of the column for topics.
+        log_length_col (str): Name of the column for logarithm of message lengths.
+        age_col (str): Name of the column for ages.
+        emoji_status_col (str): Name of the column for emoji status.
+        year_col (str): Name of the column for years.
+        language_col (str): Name of the column for languages.
+        hour_col (str): Name of the column for hours.
+        date_col (str): Name of the column for dates.
+        isoweek_col (str): Name of the column for ISO weeks.
+        year_week_col (str): Name of the column for year-week.
+        timeformat (str): String format for date and time.
+        basic_color (str): Default color for plots.
+        color_palette (list): List of colors for plotting.
+        basic_color_highlight (str): Highlight color for plots.
+        color_vertical_line (str): Color for vertical lines in plots.
+    """
     img_dir: Path
     timestamp_col: str
     message_col: str
@@ -20,32 +53,72 @@ class Config:
     age_col: str
     emoji_status_col: str
     year_col: str
-    language_col:str
-    hour_col:str
-    date_col:str
-    isoweek_col:str
-    year_week_col:str
-    timeformat: str 
+    language_col: str
+    hour_col: str
+    date_col: str
+    isoweek_col: str
+    year_week_col: str
+    timeformat: str
     basic_color: str
     color_palette: list
     basic_color_highlight: str
     color_vertical_line: str
 
+
 @dataclass
 class BaseStrings:
-    dutch_stopwords : list
-    italian_stopwords : list
-    dutch_frequentwords : list
-    italian_frequentwords : list
+    """
+    A class to hold various string lists and dictionaries for processing.
+
+    Attributes:
+        dutch_stopwords (list): List of Dutch stopwords.
+        italian_stopwords (list): List of Italian stopwords.
+        dutch_frequentwords (list): List of frequently used Dutch words.
+        italian_frequentwords (list): List of frequently used Italian words.
+        topic_keywords (dict): Dictionary of keywords associated with topics.
+    """
+    dutch_stopwords: list
+    italian_stopwords: list
+    dutch_frequentwords: list
+    italian_frequentwords: list
     topic_keywords: dict
  
 @dataclass
 class Folders:
+    """
+    A class to represent folder paths for data processing.
+
+    Attributes:
+        raw (Path): Path to the folder containing raw data.
+        processed (Path): Path to the folder for processed data.
+        datafile (Path): Path to the main data file.
+        current (Path): Path to the current working directory.
+        csv (Path): Path to the CSV file.
+    """
     raw: Path
     processed: Path
     datafile: Path
     current: Path
     csv: Path
+
+    def __repr__(self):
+        return (f"Folders(raw={self.raw}, processed={self.processed}, "
+                f"datafile={self.datafile}, current={self.current}, "
+                f"csv={self.csv})")
+
+@dataclass
+class Embedding:
+    metadata: list
+    vectors: np.ndarray
+
+    def __getitem__(self, idx: int) -> tuple:
+        return (self.vectors[idx], self.metadata[idx])
+
+    def __len__(self) -> int:
+        return len(self.metadata)
+
+    def __repr__(self) -> str:
+        return f"Embedding, dims={self.vectors.shape}"
     
 keywordsFilter = BaseStrings(
             dutch_stopwords  = ["aan","aangaande","aangezien","achte","achter","achterna","af","afgelopen","al","aldaar","aldus","alhoewel","alias","alle","allebei","alleen","alles","als","alsnog","altijd","altoos","ander","andere","anders","anderszins","beetje","behalve","behoudens","beide","beiden","ben","beneden","bent","bepaald","betreffende","bij","bijna","bijv","binnen","binnenin","blijkbaar","blijken","boven","bovenal","bovendien","bovengenoemd","bovenstaand","bovenvermeld","buiten","bv","daar","daardoor","daarheen","daarin","daarna","daarnet","daarom","daarop","daaruit","daarvanlangs","dan","dat","de","deden","deed","der","derde","derhalve","dertig","deze","dhr","die","dikwijls","dit","doch","doe","doen","doet","door","doorgaand","drie","duizend","dus","echter","een","eens","eer","eerdat","eerder","eerlang","eerst","eerste","eigen","eigenlijk","elk","elke","en","enig","enige","enigszins","enkel","er","erdoor","erg","ergens","etc","etcetera","even","eveneens","evenwel","gauw","ge","gedurende","geen","gehad","gekund","geleden","gelijk","gemoeten","gemogen","genoeg","geweest","gewoon","gewoonweg",'goede','goed',"haar","haarzelf","had","hadden","hare","heb","hebben","hebt","hedden","heeft","heel","hem","hemzelf","hen","het","hetzelfde","hier","hierbeneden","hierboven","hierin","hierna","hierom","hij","hijzelf","hoe","hoewel","honderd","hun","hunne","ieder","iedere","iedereen","iemand","iets","ik","ikzelf", "inderdaad","inmiddels","intussen","inzake","is","ja","je","jezelf","jij","jijzelf","jou","jouw","jouwe","juist","jullie","kan","klaar","kon","konden","krachtens","kun","kunnen","kunt","laatst","later","liever","lijken","lijkt","maak","maakt","maakte","maakten","maar","mag","maken","me","meer","meest","meestal","men","met","mevr","mezelf","mij","mijn","mijnent","mijner","mijzelf","minder","miss","misschien","missen","mits","mocht","mochten","moest","moesten","moet","moeten","mogen","mr","mrs","mw","na","naar","nadat","nam","namelijk","nee","neem","negen","nemen","nergens","net","niemand","niet","niets","niks","noch","nochtans","nog","nogal","nooit","nu","nv","of","ofschoon","om","omdat","omhoog","omlaag","omstreeks","omtrent","omver","ondanks","onder","ondertussen","ongeveer","ons","onszelf","onze","onzeker","ooit","ook","op","opnieuw","opzij","over","overal","overeind","overige","overigens","paar","pas","precies","recent","redelijk","reeds","rond","rondom","samen","sedert","sinds","sindsdien","slechts","sommige","spoedig","steeds","tamelijk","te","tegen","tegenover","tenzij","terwijl","thans","tien","tiende","tijdens","tja","toch","toe","toen","toenmaals","toenmalig","tot","totdat","tussen","twee","tweede","u","uit","uitgezonderd","uw","vaak","vaakwat","van","vanaf","vandaan","vanuit","vanwege","veel","veeleer","veertig","verder","verscheidene","verschillende","vervolgens","vier","vierde","vijf","vijfde","vijftig","vol","volgend","volgens","voor","vooraf","vooral","vooralsnog","voorbij","voordat","voordezen","voordien","voorheen","voorop","voorts","vooruit","vrij","vroeg","waar","waarom","waarschijnlijk","wanneer","want","waren","was","wat","we","wederom","weer","weg","wegens","weinig","wel","weldra","welk","welke","werd","werden","werder","wezen","whatever","wie","wiens","wier","wij","wijzelf","wil","wilden","willen","word","worden","wordt","zal","ze","zei","zeker","zelf","zelfde","zelfs","zes","zeven","zich","zichzelf","zij","zijn","zijne","zijzelf","zo","zoals","zodat","zodra","zonder","zou","zouden","zowat","zulk","zulke","zullen","zult",'turks', 'ivm'],
@@ -107,5 +180,6 @@ extraRegexes = BaseRegexes(patterns={
             "date_phone" : r'^\d{2}-\d{2}-\d{4} \d{2}:\d{2} - \+\d{2} \d{2} \d{4} \d{4}: ', # detect date followed by phone
             "bericht_verwijderd": r'bericht verwijderd', # delete message about deleted messages 
             "return_newline": r'[\r\n?]', # returns en new lines
-            "username_pattern" : r"^@[a-zA-Z0-9._]+"
+            "username_pattern" : r"^@[a-zA-Z0-9._]+",
+            "@telefoonummer": r"@\d{10,13}"
         } )    

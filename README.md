@@ -30,5 +30,5 @@ visualizer --week <nr>
 ```
 
 ```bash
-visualizer --all True # to run all the visualizations
+visualizer --all  # to run all the visualizations
 ```
