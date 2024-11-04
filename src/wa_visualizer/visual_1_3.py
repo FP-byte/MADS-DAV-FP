@@ -50,6 +50,7 @@ class BarPlot(BasicPlot):
         """
         # Plotting
         ax = data.plot(kind='bar', stacked=stacked, figsize=(10, 8), color=self.custom_colors)
+
         
         plt.title(self.title_fig)
         plt.ylabel(self.ylabel)
@@ -74,7 +75,7 @@ class BarPlotVisualizer(Preprocessor):
         Creates a bar plot visualization for week 1 data.
         """
         plot = BarPlot(
-            title_fig="Tekst overwinning: Een Foto is Geen Duizend Woorden Waard",
+            title_fig="Chats: Wanneer Woorden Luidere Spreken Dan Beelden",
             ylabel="% van berichten",
             xlabel="Auteur",
             filename="1_categories_visualization.png",

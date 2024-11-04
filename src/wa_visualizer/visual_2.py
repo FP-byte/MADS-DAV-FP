@@ -77,6 +77,7 @@ class TimeSeriesPlot(BasicScatterPlot):
         ax.set_xticks(xticks)
         ax.set_xticklabels(xticks, rotation=45, ha='right')
 
+
         # Save the plot
         filename = self.config.img_dir / Path(self.filename)
         self.save()

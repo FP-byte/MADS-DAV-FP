@@ -5,6 +5,8 @@
 
 ***Naam: Francesca Paulin Tumburus***
 
+***Studentnr: 1882135***
+
 ***Cursus: Data Analysis and Visualization***
 
 ***Datum: 05-11-2024***
@@ -46,7 +48,7 @@ The processing step maakt gebruik van de data geleverd in de eerdere visualisati
 
 <div class="page"/>
 
-### Visualisatie 1: Tekst overwinning: Een Foto Vervangt Geen Woorden
+### Visualisatie 1: Tekstuele Gesprekken: Wanneer Woorden Luidere Spreken Dan Beelden
 ![Tekst overwinning](../img/1_categories_visualization.png)
 
 De categorievisualisatie biedt een eerste blik op de dataset, waarin verbale en non-verbale communicatie met elkaar worden vergeleken. Deze visualisatie is een belangrijke stap in het blootleggen van communicatiepatronen binnen de dataset: het toont een samenvatting van variaties in communicatiestijlen per gebruiker. Wie stuurt de meeste of de minste foto's en emoji's? Wie schrijft het meest?
@@ -92,14 +94,14 @@ De preattemptive processing maakt gebruik van kleurverschillen in twee naast elk
 
 <div class="page"/>
 
-### Visualisatie 5: dimension reduction
+### Visualisatie 5: Focus en Flair: Gespreksonderwerpen die Ertoe Doen
 
-![Onderwerpen zijn belangrijk](../img/5_tsne_topics_visualization.png)
-De onderwerpen vormen een duidelijk patroon. Bij het toepassen van dimensiereductie met t-SNE komen deze onderwerpen goed naar voren. Vooral de thema's rondom voedsel en eerdere berichten met het verzoek om naar huis te komen zijn samengevoegd in herkenbare clusters.
+![Focus en Flair](../img/5_tsne_topics_visualization.png)
+De onderwerpen vormen van de chat zijn een duidelijk patroon die via het toepassen van dimensiereductie met t-SNE naar voren. Vooral de thema's rondom voedsel en eerdere berichten naar tiener van type 'kom thuis' zijn samengevoegd in herkenbare clusters en in het blauw weergegeven.
 
-Als we ook de verdeling van talen in dezelfde dataset bekijken, valt op dat de kluster in het oranje is zowel per taal als per onderwerp zeer specifiek: de conversaties gaan over vakanties in Italie en in het Italiaas. 
+Als we ook de verdeling van talen in dezelfde dataset bekijken, valt op dat de kluster in het groen is zowel per taal als per onderwerp zeer specifiek: de conversaties gaan over eten en vakanties in Italie en dus ook in het Italiaas. 
 
-![Talenknobbels](../img/5_tsne_language_visualization.png)
+![Smakelijke Gesprekken](../img/5_tsne_language_visualization.png)
 
 De preattentieve verwerking maakt gebruik van kleurverschillen om de verschillende onderwerpen en talen te visualiseren. Proximity en similarity worden weergegeven door datapunten dicht bij elkaar te tekenen. Elke coördinaat in t-SNE vertegenwoordigt een afstand in gelijkenis qua betekenis.
 

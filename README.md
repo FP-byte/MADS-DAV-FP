@@ -1,4 +1,6 @@
 # Visualisaties van de cursu Data Analysis & Visualisation - Master Data science
+## Naam: Francesca Paulin Tumburus
+## Studentnr: 1882135
 
 # Run the visualisations
 

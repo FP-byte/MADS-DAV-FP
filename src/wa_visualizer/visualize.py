@@ -11,7 +11,7 @@ import numpy as np
 from wa_visualizer.data_processing import Preprocessor
 from wa_visualizer.settings import (BaseRegexes, Folders, Config, BaseStrings, keywordsFilter, extraRegexes, basicConfig)
 from wa_visualizer.filehandler import FileHandler
-from wa_visualizer.visual_1 import BarPlotVisualizer
+from wa_visualizer.visual_1_3 import BarPlotVisualizer
 from wa_visualizer.visual_2 import TimeSeriesPlotVisualizer
 from wa_visualizer.visual_4 import RelationshipsPlotVisualizer
 from wa_visualizer.visual_5 import TSNEPlotVisualizer
@@ -64,7 +64,7 @@ def main(week, all):
         preprocessor()
         #start logger
         logger.remove()
-        logger.add("logs/logfile.log", rotation="1 week", level="DEBUG")
+        logger.add('./logs/logfile.log' , rotation="1 week", level="DEBUG")
         logger.add(sys.stderr, level="INFO")
         bar_plot_visualizer = False
 

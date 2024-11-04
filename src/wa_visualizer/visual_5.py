@@ -20,7 +20,7 @@ class ScatterPlot(BasicPlot):
         metadata_lb (str, optional): Label for metadata used in hue. Defaults to "author".
         alpha (float, optional): Alpha transparency for the points. Defaults to 0.9.
     """
-    def __init__(self, title_fig: str, xlabel: str, ylabel: str, filename: str, custom_palette: list, metadata_lb: str = "author", alpha: alpha: float = 0.9, figsize: tuple = (20, 8)):
+    def __init__(self, title_fig: str, xlabel: str, ylabel: str, filename: str, custom_palette: list, metadata_lb: str = "author", alpha: float = 0.9, figsize: tuple = (20, 8)):
         super().__init__(title_fig, xlabel, ylabel, filename, figsize)
         self.custom_palette = custom_palette
         self.metadata_lb = metadata_lb
