@@ -15,12 +15,13 @@ class ScatterPlot(BasicPlot):
         xlabel (str): Label for the x-axis.
         ylabel (str): Label for the y-axis.
         filename (str): Filename for saving the plot.
+        figsize (tuple, optional): The size of the figure in inches (width, height). Default is (20, 8).
         custom_palette (list): Custom color palette for the scatter plot.
         metadata_lb (str, optional): Label for metadata used in hue. Defaults to "author".
         alpha (float, optional): Alpha transparency for the points. Defaults to 0.9.
     """
-    def __init__(self, title_fig: str, xlabel: str, ylabel: str, filename: str, custom_palette: list, metadata_lb: str = "author", alpha: float = 0.9):
-        super().__init__(title_fig, xlabel, ylabel, filename)
+    def __init__(self, title_fig: str, xlabel: str, ylabel: str, filename: str, custom_palette: list, metadata_lb: str = "author", alpha: alpha: float = 0.9, figsize: tuple = (20, 8)):
+        super().__init__(title_fig, xlabel, ylabel, filename, figsize)
         self.custom_palette = custom_palette
         self.metadata_lb = metadata_lb
         self.alpha = alpha
@@ -59,7 +60,7 @@ class TSNEPlotVisualizer:
 
     Args:
         preprocessor (Preprocessor): Class responsible for preprocessing steps.
-        custom_palette (list, optional): Custom color palette for the plots. Defaults to 'dark'.
+        custom_palette (list, optional): Custom color palette for the plots. Defaults to 'dark' color palette.
     """
     def __init__(self, preprocessor: Preprocessor, custom_palette: list = 'dark'):
         self.config = preprocessor.config
@@ -82,26 +83,35 @@ class TSNEPlotVisualizer:
         # Preprocessing step for t-SNE data
         X, emb = self.preprocessor.preprocess_week5(subset)  # Replace with actual method to get X and emb
 
+        #create scatterplot with title and filename
         scatter_plot = ScatterPlot(
-            title_fig='Gesproken onderwerpen zijn essentieel',
+            title_fig='Focus en Flair: Gespreksonderwerpen die Ertoe Doen',
             xlabel='t-SNE Component 1',
             ylabel='t-SNE Component 2',
-            filename='tsne_plot_topics.png',
-            custom_palette=self.custom_palette,
-            metadata_lb="topic"  # You can adjust this to whatever metadata you need
+            filename='5_tsne_topics_visualization.png',
+            custom_palette=['darkblue',  'gray', 'green', 'lightgray'],
+            metadata_lb="topic"  
         )
-
+        #plot data
         scatter_plot.plot(X, emb)
+        #save plot
+        scatter_plot.save()
+        #show plot
         scatter_plot.show_plot()
-
+        
+        #create scatterplot with title and filename
         scatter_plot2 = ScatterPlot(
-            title_fig='Taalstructuren: voedsel gesprekken zijn uitgesproken Italiaans',
+            title_fig='Smakelijke Gesprekken: Voedselgesprekken zijn makkelijker in het Italiaans',
             xlabel='t-SNE Component 1',
             ylabel='t-SNE Component 2',
-            filename='tsne_plot_languages.png',
-            custom_palette=self.custom_palette,
-            metadata_lb="language"  # You can adjust this to whatever metadata you need
+            filename='5_tsne_language_visualization.png',
+            custom_palette=['gray',  'green'],
+            metadata_lb="language"  
         )
 
+        #plot data
         scatter_plot2.plot(X, emb)
+        #save plot
+        scatter_plot2.save()
+        #show plot
         scatter_plot2.show_plot()

@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 from wa_visualizer.settings import (BaseRegexes, Folders, Config, BaseStrings, keywordsFilter, extraRegexes, basicConfig, Embedding)
 from wa_visualizer.filehandler import FileHandler
+from sklearn.manifold import TSNE
 
 #from sentence_transformers import SentenceTransformer
 from sklearn.manifold import TSNE
@@ -535,6 +536,30 @@ class Preprocessor(FileHandler):
 
         return avg_log_df  # Return the resulting DataFrame
 
+    def create_embedding(self, subset, model):   
+        metadata = {}
+        text = []
+        for idx, row in subset.iterrows():
+            author = row["author"]
+            message = row["message"]
+            timestamp = row["timestamp"]
+            topic = row["topic"]
+            language = row["language"]
+            age = row["age"]
+            metadata[idx] = {"author": author, "message": message, "timestamp": timestamp, "topic": topic, 
+            "language": language, 'age': age}
+            text.append(message)
+        #embed text
+        vectors = model.encode(text)
+        print(vectors.shape)
+        return Embedding(metadata, vectors)
+
+    def fit_tsne(self, emb, n_components=2, learning_rate=200, perplexity=30, n_iter=1000):
+        #tsne = TSNE(n_components=2)
+        tsne =TSNE(n_components=2, learning_rate=learning_rate, perplexity=perplexity, n_iter=n_iter)
+        X = tsne.fit_transform(emb.vectors)
+        return X
+
     def preprocess_week5(self, subset:pd.DataFrame):
         """
         Preprocess the data for week 5 by creating embeddings and applying t-SNE.
@@ -550,7 +575,7 @@ class Preprocessor(FileHandler):
         # Load the pre-trained SentenceTransformer model
         model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
         # Create embeddings for the input subset using the loaded model
-        emb = create_embedding(subset, model)
+        emb = self.create_embedding(subset, model)
         # Apply t-SNE to the embeddings to reduce dimensionality for visualization
         X = fit_tsne(emb, learning_rate=300, perplexity=15, n_iter=2000)
 
