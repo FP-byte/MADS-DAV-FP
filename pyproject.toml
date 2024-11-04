@@ -22,7 +22,6 @@ dependencies = [
     "joypy>=0.2.6",
     "torch>=2.4.1",
     "isort>=5.13.2",
-    "sentence-transformers>=3.2.1",
     "sentence_transformers>=3.2.1",
 ]
 
