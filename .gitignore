@@ -25,3 +25,4 @@ img/figure1.png
 reports/project_whatsapp_visualisatie.pdf
 sentence_transformers/*
 notebooks/.ipynb_checkpoints/*
+data/raw/*
