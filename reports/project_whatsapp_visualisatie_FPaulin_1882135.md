@@ -70,7 +70,7 @@ De *preattentieve processing* in deze visualisatie wordt gerealiseerd door kleur
 
 De visualisatie maakt effectief gebruik van *proximity*, *similarity* en *enclosure* om de visuele helderheid te verbeteren. *Proximity* wordt toegepast door de tijdstempels op de x-as per week te groeperen, wat het gemakkelijker maakt om trends en tijdsgebonden veranderingen te interpreteren. De geselecteerde berichten zijn gefocust op een kleiner tijdsframe rondom de coronaperiodes en daarna, wat de visualisatie duidelijker en gerichter maakt.
 
-*Similarity* komt tot uiting in het consistente kleurgebruik van de punten en lijnen, die elk één type communicatieactiviteit vertegenwoordigen. Dit creëert visuele eenheid en maakt het gemakkelijk om de verschillende soorten activiteit te onderscheiden. *Enclosure* wordt gebruikt door de grijze schaduw die de periode tussen de begin- en einddata van de lockdown markeert. Dit helpt de aandacht van de kijker te richten op deze specifieke periode en benadrukt de impact die de lockdowns hadden op het communicatiepatroon: de totale stilte.
+*Similarity* komt tot uiting in het consistente kleurgebruik van de punten en lijnen, die elk één type communicatieactiviteit vertegenwoordigen. Dit creëert visuele eenheid en maakt het gemakkelijk om de verschillende soorten activiteit te onderscheiden. *Enclosure* wordt gebruikt door de grijze schaduw die de periode tussen de begin- en einddata van de lockdown markeert. Dit helpt de aandacht van de kijker te richten op deze specifieke periode en benadrukt de impact die de lockdowns hadden op het de gezinsleven.
 
 <div class="page"/>
 
