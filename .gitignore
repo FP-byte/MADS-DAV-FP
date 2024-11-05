@@ -14,7 +14,7 @@ data/processed/*.parq
 .DS_Store
 *.egg-info
 *reference.json
-notebooks/*
+notebooks/tests/*
 .python-version
 checklist.md
 *.toml
@@ -24,3 +24,4 @@ reports/.pdf
 img/figure1.png
 reports/project_whatsapp_visualisatie.pdf
 sentence_transformers/*
+notebooks/.ipynb_checkpoints/*
