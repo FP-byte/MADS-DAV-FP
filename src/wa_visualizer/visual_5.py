@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import pandas as pd
-from wa_visualizer.settings import Config
+from wa_visualizer.settings import (Config, Embedding)
 from wa_visualizer.basic_plots import BasicPlot
 from wa_visualizer.data_processing import Preprocessor
 
@@ -28,7 +28,7 @@ class ScatterPlot(BasicPlot):
         self.alpha = alpha
         self.ax = ax  # Keep track of the axis for plotting
 
-    def plot(self, X: np.ndarray, emb)->None:
+    def plot(self, X: np.ndarray, emb: Embedding)->None:
         """
         Plots a scatter plot using the given data and embeddings on the specified axis.
 
@@ -66,12 +66,12 @@ class TSNEPlotVisualizer:
         preprocessor (Preprocessor): Class responsible for preprocessing steps.
         custom_palette (list, optional): Custom color palette for the plots. Defaults to 'dark' color palette.
     """
-    def __init__(self, preprocessor: Preprocessor, custom_palette: list = 'dark'):
+    def __init__(self, preprocessor: Preprocessor, custom_palette: list):
         self.config = preprocessor.config
         self.preprocessor = preprocessor
         self.custom_palette = custom_palette
 
-    def plot_all_tsne(self, X, emb, custom_palette='dark', alpha=0.9, filename='5_tsne_visualization.png')->None:
+    def plot_all_tsne(self, X :np.ndarray, emb:Embedding, custom_palette :list, alpha :float =0.9, filename :str ='5_tsne_visualization.png')->None:
         """
         Creates two side-by-side t-SNE scatter plots for visualizing the clustering of data based on 
         topics and languages. The function uses the ScatterPlot class to create the plots and saves 

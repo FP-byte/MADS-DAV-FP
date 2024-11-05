@@ -71,28 +71,46 @@ class FacetGridPlot(BasicPlot):
 
 class RelationshipsPlotVisualizer(Preprocessor):
     """
-    Visualizes relationships in data.
+    Visualizes relationships in data, specifically focusing on the relationship between age and message length 
+    (in terms of log-transformed values) and the impact of emojis on communication efficiency.
 
     Args:
-        preprocessor (Preprocessor): Class responsible for preprocessing steps.
+        preprocessor (Preprocessor): Class responsible for preprocessing steps such as cleaning, transforming,
+                                      and preparing the data for visualization.
     """
     def __init__(self, preprocessor: Preprocessor):
+        """
+        Initializes the RelationshipsPlotVisualizer with the provided preprocessor.
+
+        Args:
+            preprocessor (Preprocessor): An instance of the Preprocessor class to handle data preprocessing.
+        """
         self.config = preprocessor.config
         self.preprocessor = preprocessor
-            
 
     def visualization_week4(self):
+        """
+        Creates a relationships plot for the week 4 data that visualizes how age correlates with the average 
+        length of messages (in logarithmic scale), highlighting the trend that adults save time typing by using emojis.
+
+        This method processes the week 4 data, specifically focusing on the age and message length, and then 
+        generates a scatter plot to visualize the relationship.
+
+        The plot is saved as '4_relationships_visualization.png'.
+
+        """
         plot = FacetGridPlot(
             config=self.config,
-           # title_fig="Getting Slower Fingers with Age: Adults Save (Typing) Time with Emojis",
-            title_fig = "Langzame vingers in een snelle wereld: volwassenen en hun emoji-tijdwinst",
+            title_fig="Langzame vingers in een snelle wereld: volwassenen en hun emoji-tijdwinst",
             xlabel='Leeftijd',
             ylabel='Gemiddelde van de logaritme van Berichtlengte',
             filename='4_relationships_visualization.png',
         )
 
-        """Creates a relationships plot for week 4 data."""
+        # Preprocess the data for week 4 (average log-transformed message length)
         avg_log_df = self.preprocessor.preprocess_week4()
-        
+
+        # Create the plot using the preprocessed data
         plot(avg_log_df, self.config.age_col, self.config.log_length_col, scatter_size=60)
+
         

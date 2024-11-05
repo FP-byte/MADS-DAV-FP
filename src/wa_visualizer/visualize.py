@@ -18,39 +18,62 @@ from wa_visualizer.visual_5 import TSNEPlotVisualizer
 import sys
 
 def run_visualization_pipeline(folders, week, all=False):
+    """
+    Runs a series of visualizations based on the specified week or for all weeks, processing and visualizing data 
+    step-by-step. This function uses a pipeline approach to process data and generate various types of plots for 
+    each week of the data.
+
+    Args:
+        folders (list): List of folder paths containing the data to be processed.
+        week (str): The specific week for which to generate the visualization. Can be '1', '2', '3', '4', '5' or 
+                    'all' to visualize plots for all weeks.
+        all (bool, optional): If True, generates visualizations for all weeks. Default is False, meaning only 
+                               the visualization for the specified week is created.
+    
+    This function supports visualizing the following plots:
+        - Week 1: Bar plots showing basic distribution of data.
+        - Week 2: Time series plots showing changes over time.
+        - Week 3: Bar plots comparing different categories.
+        - Week 4: Relationship plots exploring correlations between different variables.
+        - Week 5: t-SNE plots showing high-dimensional data reduced to 2D space.
+    """
     # Start preprocessor for week visualization
-        preprocessor = Preprocessor(folders, basicConfig, keywordsFilter)
-        # load cleaned data
-        # preprocessor()
-        # initiate plot visualizer object 
-        bar_plot_visualizer = False
+    preprocessor = Preprocessor(folders, basicConfig, keywordsFilter)
+    # Initialize plot visualizer object
+    bar_plot_visualizer = False
 
-        if week.lower() == "1" or all:
-            print("visualize plot week 1")
-            if not bar_plot_visualizer:
-                bar_plot_visualizer = BarPlotVisualizer(preprocessor)
-            bar_plot_visualizer.visualization_week1()
+    # Visualize plot for week 1 or all weeks
+    if week.lower() == "1" or all:
+        print("Visualizing plot for week 1")
+        if not bar_plot_visualizer:
+            bar_plot_visualizer = BarPlotVisualizer(preprocessor)
+        bar_plot_visualizer.visualization_week1()
 
-        if week.lower() == "2" or all:
-            print("visualize plot week 2")
-            time_series_plot_visualizer = TimeSeriesPlotVisualizer(preprocessor)
-            time_series_plot_visualizer.visualization_week2()
+    # Visualize plot for week 2 or all weeks
+    if week.lower() == "2" or all:
+        print("Visualizing plot for week 2")
+        time_series_plot_visualizer = TimeSeriesPlotVisualizer(preprocessor)
+        time_series_plot_visualizer.visualization_week2()
 
-        if week.lower() == "3" or all:
-            print("visualize plot week 3")
-            if not bar_plot_visualizer:
-                bar_plot_visualizer = BarPlotVisualizer(preprocessor)
-            bar_plot_visualizer.visualization_week3()
+    # Visualize plot for week 3 or all weeks
+    if week.lower() == "3" or all:
+        print("Visualizing plot for week 3")
+        if not bar_plot_visualizer:
+            bar_plot_visualizer = BarPlotVisualizer(preprocessor)
+        bar_plot_visualizer.visualization_week3()
 
-        if week.lower() == "4" or all:
-            print("visualize plot week 4")
-            relationships_plot_visualizer = RelationshipsPlotVisualizer(preprocessor)
-            relationships_plot_visualizer.visualization_week4()
+    # Visualize plot for week 4 or all weeks
+    if week.lower() == "4" or all:
+        print("Visualizing plot for week 4")
+        relationships_plot_visualizer = RelationshipsPlotVisualizer(preprocessor)
+        relationships_plot_visualizer.visualization_week4()
 
-        if week.lower() == "5" or all:
-            print("visualize plot week 5")
-            relationships_plot_visualizer = TSNEPlotVisualizer(preprocessor)
-            relationships_plot_visualizer.visualization_week5()
+    # Visualize plot for week 5 or all weeks
+    if week.lower() == "5" or all:
+        print("Visualizing plot for week 5")
+        relationships_plot_visualizer = TSNEPlotVisualizer(preprocessor)
+        relationships_plot_visualizer.visualization_week5()
+
 
 @click.command()
 @click.option("--week", default="1", help="Week number: input 1 to 5")
@@ -65,6 +88,8 @@ def main(week, all):
     
     Raises:
         ValueError: If the specified week number is not between 1 and 5.
+        FileNotFoundError: If the specified file is not found
+        General Error: for all other cases
     """
     #start logger
     logger.remove()
