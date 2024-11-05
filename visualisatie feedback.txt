@@ -1,6 +1,0 @@
-visualisatie 3: omlijning weg
-visualisatie 1: datalabels % weg, kleur rood wordt grijs, titel auters en percentage-teken %, legenda naast
-visualisatie 2: legenda weg, timstamp y anders, stippel lijn wit maken, tekst in blauw, minder sticks op x-as
-visualisatie 4: grid weg, omlijning we en twee visualisaties naast elkaar
-
-tqdm: progressbar

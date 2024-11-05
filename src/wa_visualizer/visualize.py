@@ -26,29 +26,29 @@ def run_visualization_pipeline(folders, week, all=False):
         bar_plot_visualizer = False
 
         if week.lower() == "1" or all:
-            print("visualize plot for week 1")
+            print("visualize plot week 1")
             if not bar_plot_visualizer:
                 bar_plot_visualizer = BarPlotVisualizer(preprocessor)
             bar_plot_visualizer.visualization_week1()
 
         if week.lower() == "2" or all:
-            print("visualize plot for week 2")
+            print("visualize plot week 2")
             time_series_plot_visualizer = TimeSeriesPlotVisualizer(preprocessor)
             time_series_plot_visualizer.visualization_week2()
 
         if week.lower() == "3" or all:
-            print("visualize plot for week 3")
+            print("visualize plot week 3")
             if not bar_plot_visualizer:
                 bar_plot_visualizer = BarPlotVisualizer(preprocessor)
             bar_plot_visualizer.visualization_week3()
 
         if week.lower() == "4" or all:
-            print("visualize plot for week 4")
+            print("visualize plot week 4")
             relationships_plot_visualizer = RelationshipsPlotVisualizer(preprocessor)
             relationships_plot_visualizer.visualization_week4()
 
         if week.lower() == "5" or all:
-            print("visualize plot for week 5")
+            print("visualize plot week 5")
             relationships_plot_visualizer = TSNEPlotVisualizer(preprocessor)
             relationships_plot_visualizer.visualization_week5()
 
@@ -71,7 +71,6 @@ def main(week, all):
     logger.add('./logs/logfile.log' , rotation="1 week", level="DEBUG")
     logger.add(sys.stderr, level="INFO")
     
-
     possible_options = ["all", '1', '2', '3', '4', '5']
     if week not in possible_options:
         raise ValueError('Must be a number between 1 and 7')
@@ -84,10 +83,10 @@ def main(week, all):
         processed = Path(config["processed"]) #path to processed
         csv = Path(config["csv"]) # csv filename 
         datafile = Path(config["current"]) # datafile name
+
     # read raw source datafiles
     rawdatafile = (Path(".") / raw / config["current"]).resolve()
     csvraw = (Path(".") / raw / config["csv"]).resolve()
-    print(csvraw)
 
     # processed datafiles paths
     datafile = (Path(".") / processed / config["current"]).resolve()

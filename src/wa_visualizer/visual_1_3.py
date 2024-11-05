@@ -75,7 +75,7 @@ class BarPlotVisualizer(Preprocessor):
         Creates a bar plot visualization for week 1 data.
         """
         plot = BarPlot(
-            title_fig="Chats: Wanneer Woorden Luidere Spreken Dan Beelden",
+            title_fig="Woorden spreken luider dan beelden",
             ylabel="% van berichten",
             xlabel="Auteur",
             filename="1_categories_visualization.png",
@@ -90,7 +90,7 @@ class BarPlotVisualizer(Preprocessor):
         Creates a bar plot visualization for week 3 data.
         """
         plot = BarPlot(
-            title_fig="Kom je naar huis? Tiener appjes van 's ochtens vroeg tot Diep in de Nacht",
+            title_fig="Kom je naar huis? Tiener appjes van 's ochtens vroeg tot diep in de nacht",
             ylabel="% van Totaal berichten",
             xlabel="Uur van de dag",
             filename="3_distribution_visualization.png",

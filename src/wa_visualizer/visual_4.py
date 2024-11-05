@@ -85,9 +85,9 @@ class RelationshipsPlotVisualizer(Preprocessor):
         plot = FacetGridPlot(
             config=self.config,
            # title_fig="Getting Slower Fingers with Age: Adults Save (Typing) Time with Emojis",
-            title_fig = "Langzame Vingers in een Snelle Wereld: Volwassenen en hun Emoji-Tijdwinst",
+            title_fig = "Langzame vingers in een snelle wereld: volwassenen en hun emoji-tijdwinst",
             xlabel='Leeftijd',
-            ylabel='Gemiddelde van de Logaritme van Berichtlengte',
+            ylabel='Gemiddelde van de logaritme van Berichtlengte',
             filename='4_relationships_visualization.png',
         )
 

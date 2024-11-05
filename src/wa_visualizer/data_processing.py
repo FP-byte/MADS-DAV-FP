@@ -425,7 +425,6 @@ class Preprocessor(FileHandler):
         Returns:
             DataFrame: A DataFrame containing aggregated language data.
         """
-        print("processing visual 1")
         self.add_communication_type()
         return self.aggregate_languages(self.data)
 
@@ -546,7 +545,7 @@ class Preprocessor(FileHandler):
             text.append(message)
         #embed text
         vectors = model.encode(text)
-        print(vectors.shape)
+        print(f'Embedding done: {vectors.shape}')
         return Embedding(metadata, vectors)
 
     def fit_tsne(self, emb, n_components=2, learning_rate=200, perplexity=30, n_iter=1000):

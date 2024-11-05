@@ -110,12 +110,12 @@ class TimeSeriesPlotVisualizer(Preprocessor):
         particularly during the lockdown periods.
         """
         plot = TimeSeriesPlot(
-            title_fig="Digitale stilte in tijden van lockdown",
-            xlabel="Datum: jaar-week",
+            title_fig="Digitale stilte in tijden van lockdown: van pixel naar persoonlijk",
+            xlabel="Periode jaartal-weeknummer",
             ylabel="Aantal berichten",
             filename="2_timeseries_visualization.png",
             vert_line_period = ['2020-13', '2021-01'],
-            vert_line_text = ['Start Intelligent lockdown', 'End Christmas lockdown'],
+            vert_line_text = ['Begin Intelligent lockdown', 'Einde Kerst-lockdown'],
             show_legend=False,  # Do not show legend in this plot
             config=self.config
         )

@@ -98,7 +98,7 @@ class TSNEPlotVisualizer:
 
         # Create ScatterPlot instance for 'topic'
         scatter_plot_1 = ScatterPlot(
-            title_fig='Focus en Flair: Gespreksonderwerpen die Ertoe Doen',
+            title_fig='Focus en Flair: Gespreksonderwerpen die ertoe doen',
             xlabel='t-SNE Component 1',
             ylabel='t-SNE Component 2',
             filename='5_tsne_topics_visualization.png',
@@ -112,7 +112,7 @@ class TSNEPlotVisualizer:
 
         # Create ScatterPlot instance for 'language'
         scatter_plot_2 = ScatterPlot(
-            title_fig='Van Pizza tot Strand: Italiaans is de Taal van Eten en Vakanties',
+            title_fig='Van pizza tot strand: Italiaans is de taal van eten en vakanties',
             xlabel='t-SNE Component 1',
             ylabel='t-SNE Component 2',
             filename='5_tsne_visualization.png',

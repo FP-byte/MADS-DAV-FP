@@ -45,8 +45,6 @@ class FileHandler():
             pd.DataFrame: The DataFrame containing the loaded processed data.
             folder (str): folder to load the data from, current is default.
         """
-        print(self.folders)
-        print(filepath)
         return pd.read_parquet(filepath)
 
     
