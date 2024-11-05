@@ -1,4 +1,5 @@
-# Data Analysis & Visualization: Rapport
+# Verslag WhatsApp-Data Analyse en Visualisatie
+## Taal, Thema's en Generatieverchillen: gezinscommunicatie onder de loep 
 
 ![Whatsapp Visualization](../img/voorkant_whatappdata_analysis.jpg)
 
@@ -15,7 +16,7 @@
 
 # Inleiding: Dataset and repo
 
-Dit rapport beschrijft de eindopdracht van de cursus 'Data Analysis & Visualization', onderdeel van de Master-opleiding Applied Data Science.
+Dit verslag beschrijft de eindopdracht van de cursus 'Data Analysis & Visualization', onderdeel van de Master-opleiding Applied Data Science.
 
 ## 1.2 Github Repository
 In de bijgeleverde READ.md vindt u de installatieinstructies. De link naar de github repository is: [github.com/FP-byte/MADS-DAV-FP](https://github.com/FP-byte/MADS-DAV-FP).
