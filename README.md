@@ -45,3 +45,18 @@ visualizer --week <nr>
 ```bash
 visualizer --all  # to run all the visualizations
 ```
+
+
+## Run the dashboard:
+
+
+Start your environment as described above then run:
+```bash
+cd dashboards # cd-ing into the correct folder
+streamlit run dashboard_1.py # executing the script
+```
+
+## Open the dashboard
+If you run this on a VM, VScode should automatically forward your port on `:8501`. You can see this under the tab `Ports`, next to the tab for `Terminal`.
+
+Locally, you can open `http://localhost:8501/` and you should see your dashboard!

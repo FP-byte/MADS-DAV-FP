@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-from wa_visualizer.filehandler import FileHandler
 import pandas as pd
 from wa_visualizer.settings import Config
 from pathlib import Path

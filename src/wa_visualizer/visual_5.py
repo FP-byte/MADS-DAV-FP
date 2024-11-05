@@ -66,7 +66,7 @@ class TSNEPlotVisualizer:
         preprocessor (Preprocessor): Class responsible for preprocessing steps.
         custom_palette (list, optional): Custom color palette for the plots. Defaults to 'dark' color palette.
     """
-    def __init__(self, preprocessor: Preprocessor, custom_palette: list):
+    def __init__(self, preprocessor: Preprocessor, custom_palette='dark'):
         self.config = preprocessor.config
         self.preprocessor = preprocessor
         self.custom_palette = custom_palette

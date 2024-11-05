@@ -1,9 +1,8 @@
 import re
 from pathlib import Path
-import datetime
 from loguru import logger
 import pandas as pd
-from wa_visualizer.settings import (BaseRegexes, Folders, Config, extraRegexes, basicConfig)
+from wa_visualizer.settings import (BaseRegexes, Folders, Config)
 from wa_visualizer.filehandler import FileHandler
 
 class DataCleaner(FileHandler):
