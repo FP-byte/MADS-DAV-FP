@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 from wa_visualizer.settings import (BaseRegexes, Folders, Config, BaseStrings, keywordsFilter, extraRegexes, basicConfig, Embedding)
 from wa_visualizer.filehandler import FileHandler
+
 from sklearn.manifold import TSNE
 
 #from sentence_transformers import SentenceTransformer
@@ -19,105 +20,101 @@ class Preprocessor(FileHandler):
     Args:
         FileHandler (class): basic data object class
     """
-    def __init__(self, folders: Folders, regexes:BaseRegexes, config:Config, strings :BaseStrings):
+    def __init__(self, folders: Folders, config:Config, strings :BaseStrings):
         super().__init__(folders, config)
         self.folder = folders
         self.config = config
-        self.regexes = regexes
         self.strings = strings
         self.whatsapp_topics={}
-        self.regexes = regexes
-        self.config = config
-        self.strings = strings
         # define dob for this dataset
         self.dob_mapping = {'effervescent-camel': 2002, 'nimble-wombat':1971, 'hilarious-goldfinch':1972, 'spangled-rabbit':2004}
     
-    def __call__(self):
-        self.process()
-        self.save_data()
+    #def __call__(self):
+       #  self.preprocess()
+       #  self.save_data()
 
-    #******** hulpmethoden *******************
+    # #******** hulpmethoden *******************
 
-    def has_emoji(self, text) -> bool:
-        """
-        Detect whether the given text contains any emoji characters.
+    # def has_emoji(self, text) -> bool:
+    #     """
+    #     Detect whether the given text contains any emoji characters.
 
-        This method uses a regular expression to identify a range of emoji characters
-        across various Unicode blocks.
+    #     This method uses a regular expression to identify a range of emoji characters
+    #     across various Unicode blocks.
 
-        Args:
-            text (str): The text in which to detect emojis.
+    #     Args:
+    #         text (str): The text in which to detect emojis.
 
-        Returns:
-            bool: True if the text contains at least one emoji, False otherwise.
-        """        
-        emoji_pattern = re.compile("["  # Compile a regex pattern for emoji detection
-            u"\U0001F600-\U0001F64F"  # Emoticons
-            u"\U0001F920-\U0001F9FF"  # Extra missing emoticons
-            u"\U0001F300-\U0001F5FF"  # Symbols & pictographs
-            u"\U0001F680-\U0001F6FF"  # Transport & map symbols
-            u"\U0001F1E0-\U0001F1FF"  # Flags (iOS)
-            u"\U00002702-\U000027B0"  # Dingbats
-            u"\U000024C2-\U0001F251"  # Miscellaneous symbols
-            "]+", flags=re.UNICODE)
+    #     Returns:
+    #         bool: True if the text contains at least one emoji, False otherwise.
+    #     """        
+    #     emoji_pattern = re.compile("["  # Compile a regex pattern for emoji detection
+    #         u"\U0001F600-\U0001F64F"  # Emoticons
+    #         u"\U0001F920-\U0001F9FF"  # Extra missing emoticons
+    #         u"\U0001F300-\U0001F5FF"  # Symbols & pictographs
+    #         u"\U0001F680-\U0001F6FF"  # Transport & map symbols
+    #         u"\U0001F1E0-\U0001F1FF"  # Flags (iOS)
+    #         u"\U00002702-\U000027B0"  # Dingbats
+    #         u"\U000024C2-\U0001F251"  # Miscellaneous symbols
+    #         "]+", flags=re.UNICODE)
 
-        return bool(emoji_pattern.search(text))  # Return True if an emoji is found
-    @logger.catch
-    def find_replace_pattern(self, text:str, pattern:str, replace_str: str='') -> str:
-        """_summary_
+    #     return bool(emoji_pattern.search(text))  # Return True if an emoji is found
+    # @logger.catch
+    # def find_replace_pattern(self, text:str, pattern:str, replace_str: str='') -> str:
+    #     """_summary_
 
-        Args:
-            text (str): text to edit
-            pattern (str): regex expression to find
-            replace_str (str, optional): text to replace with. Defaults to ''.
+    #     Args:
+    #         text (str): text to edit
+    #         pattern (str): regex expression to find
+    #         replace_str (str, optional): text to replace with. Defaults to ''.
 
-        Returns:
-            str: string edited
-        """               
-        return re.sub(pattern, replace_str, text)
-    @logger.catch
-    def clean_message(self, text: str)-> str:
-        """
-        clean message texts for specific patterns  
-        Args:
-            text (str): input text
+    #     Returns:
+    #         str: string edited
+    #     """               
+    #     return re.sub(pattern, replace_str, text)
+    # @logger.catch
+    # def clean_message(self, text: str)-> str:
+    #     """
+    #     clean message texts for specific patterns  
+    #     Args:
+    #         text (str): input text
 
-        Returns:
-            str: cleaned text
-        """       
-        #removes return and new lines
-        for pattern in self.regexes.patterns.values():
-            text = self.find_replace_pattern(text, pattern)
+    #     Returns:
+    #         str: cleaned text
+    #     """       
+    #     #removes return and new lines
+    #     for pattern in self.regexes.patterns.values():
+    #         text = self.find_replace_pattern(text, pattern)
             
-        return text.strip()
-    @logger.catch
-    def delete_system_messages(self, df:pd.DataFrame, author:str)-> pd.DataFrame:
-        """
-        Delete authomatic system messages under the same author name
+    #     return text.strip()
+    # @logger.catch
+    # def delete_system_messages(self, df:pd.DataFrame, author:str)-> pd.DataFrame:
+    #     """
+    #     Delete authomatic system messages under the same author name
 
-        Args:
-            df (pd.DataFrame): data to change
-            author (str): author name as given to automatic author messages
-        Returns:
-            pd.DataFrame: dataframe without the author
-        """        	    
-        sys_messages = df[df[self.config.author_col]==author].index
-        df.drop(sys_messages, inplace=True, axis=0)
-        return df
-    @logger.catch
-    def merge_users(self, df:pd.DataFrame, author1:str, author2:str)-> pd.DataFrame:
-        """
-        Merge two users which are using aliases, for ex. two different telephones but are the same person
+    #     Args:
+    #         df (pd.DataFrame): data to change
+    #         author (str): author name as given to automatic author messages
+    #     Returns:
+    #         pd.DataFrame: dataframe without the author
+    #     """        	    
+    #     sys_messages = df[df[self.config.author_col]==author].index
+    #     df.drop(sys_messages, inplace=True, axis=0)
+    #     return df
+    # @logger.catch
+    # def merge_users(self, df:pd.DataFrame, author1:str, author2:str)-> pd.DataFrame:
+    #     """
+    #     Merge two users which are using aliases, for ex. two different telephones but are the same person
 
-        Args:
-            df (pd.DataFrame): dataframe to modify
-            author1 (str): author1 is the main author
-            author2 (str): author alias to replace with author1 
-        Returns:
-            pd.DataFrame: dataframe with merged authors
-        """        
-        df.loc[df[self.config.author_col]==author2, 'author'] = author1
-        return df
+    #     Args:
+    #         df (pd.DataFrame): dataframe to modify
+    #         author1 (str): author1 is the main author
+    #         author2 (str): author alias to replace with author1 
+    #     Returns:
+    #         pd.DataFrame: dataframe with merged authors
+    #     """        
+    #     df.loc[df[self.config.author_col]==author2, 'author'] = author1
+    #     return df
     @logger.catch
     def add_communication_type(self) -> None:
         """
@@ -302,7 +299,7 @@ class Preprocessor(FileHandler):
         df[self.config.hour_col] = df[self.config.timestamp_col].dt.hour
         keywords = self.strings.topic_keywords
         # Add author names to the people keywords
-        keywords['people'] = self.data.author.unique().tolist() + keywords['people']
+        keywords[self.config.people_topic] = self.data.author.unique().tolist() + keywords[self.config.people_topic]
         
         # Initialize an empty dictionary to hold filtered DataFrames
         filtered_dfs = {topic: None for topic in keywords.keys()}
@@ -312,13 +309,13 @@ class Preprocessor(FileHandler):
             df = df[df[self.config.topic_col] != topic]  # Remove rows already categorized
         
         # Remaining rows are classified as 'other'
-        filtered_dfs['other'] = df
+        filtered_dfs[self.config.other_topic] = df
         df_all = pd.concat(filtered_dfs.values(), ignore_index=True)
         
         # save data only if all strings are included
         if df_all.shape[0] == self.data.shape[0]:
             self.data = df_all
-            file_topics = self.folders.processed / Path(self.folders.current).stem
+            file_topics = self.folders.processed / Path(self.folders.datafile).stem
             #save to a specific csv
             df_all.to_csv(f"{file_topics}_with_topics.csv", index=False)
             self.save_data()
@@ -357,65 +354,63 @@ class Preprocessor(FileHandler):
         # Normalize each column to percentages
         df_normalized = df_counts.iloc[:, :-1].div(df_counts['Total'], axis=0) * 100    
         
-        return df_normalized
-
-              
+        return df_normalized         
    
-    #***************** data cleaning steps ***********************
-    @logger.catch
-    def clean_data(self):
-        """
-        Cleans the dataset by removing unwanted messages and normalizing user data.
+    # #***************** data cleaning steps ***********************
+    # @logger.catch
+    # def clean_data(self):
+    #     """
+    #     Cleans the dataset by removing unwanted messages and normalizing user data.
 
-        This method performs several data cleaning operations:
-        - Deletes system messages from the dataset.
-        - Merges messages from two specified users into one.
-        - Cleans message content using a regex-based approach.
-        - Removes empty messages from the dataset.
-        - Re-evaluates the presence of emojis in the cleaned messages.
+    #     This method performs several data cleaning operations:
+    #     - Deletes system messages from the dataset.
+    #     - Merges messages from two specified users into one.
+    #     - Cleans message content using a regex-based approach.
+    #     - Removes empty messages from the dataset.
+    #     - Re-evaluates the presence of emojis in the cleaned messages.
 
-        After processing, the cleaned data is updated in the instance's data attribute.
+    #     After processing, the cleaned data is updated in the instance's data attribute.
 
-        Returns:
-            None
-        """
-        df = self.data.copy()
-        message = self.config.message_col
-        # Delete system messages 
-        df = self.delete_system_messages(df, 'glittering-penguin')
-        # Merging two users 
-        df = self.merge_users(df, 'effervescent-camel', 'funny-bouncing')  
-        # Remove messages with regex
-        df[message] = df[message].apply(self.clean_message)
-        empty_messages = df[df[message] == ""].index
-        df.drop(empty_messages, axis=0, inplace=True)
-        # Rerun emoticon detection for missing emojis
-        df[self.config.has_emoji_col] = df[message].apply(self.has_emoji)
-        # Update current data
-        self.data = df
-        logger.info('Data cleaned')
+    #     Returns:
+    #         None
+    #     """
+    #     df = self.data.copy()
+    #     message = self.config.message_col
+    #     # Delete system messages 
+    #     df = self.delete_system_messages(df, 'glittering-penguin')
+    #     # Merging two users 
+    #     df = self.merge_users(df, 'effervescent-camel', 'funny-bouncing')  
+    #     # Remove messages with regex
+    #     df[message] = df[message].apply(self.clean_message)
+    #     empty_messages = df[df[message] == ""].index
+    #     df.drop(empty_messages, axis=0, inplace=True)
+    #     # Rerun emoticon detection for missing emojis
+    #     df[self.config.has_emoji_col] = df[message].apply(self.has_emoji)
+    #     # Update current data
+    #     self.data = df
+    #     logger.info('Data cleaned')
 
-    @logger.catch
-    def process(self)-> None:
-        """
-        Performs data transformation steps required before visualizations.
+    # @logger.catch
+    # def process(self)-> None:
+    #     """
+    #     Performs data transformation steps required before visualizations.
 
-        This method orchestrates several preprocessing operations, including:
-        - Cleaning the data to remove unwanted entries.
-        - Adding a language column for visualization purposes.
-        - Processing date information for further visualizations.
-        - Saving the preprocessed data to a file for future use.
+    #     This method orchestrates several preprocessing operations, including:
+    #     - Cleaning the data to remove unwanted entries.
+    #     - Adding a language column for visualization purposes.
+    #     - Processing date information for further visualizations.
+    #     - Saving the preprocessed data to a file for future use.
 
-        Returns:
-            None
-        """
-        self.clean_data()
-        # Add language column for visualization 1
-        self.add_communication_type()
-        # Add date transformation for visualization 2
-        self.process_dates()
-        # Save preprocessed data
-        self.save_data()
+    #     Returns:
+    #         None
+    #     """
+    #     self.clean_data()
+    #     # Add language column for visualization 1
+    #     self.add_communication_type()
+    #     # Add date transformation for visualization 2
+    #     self.process_dates()
+    #     # Save preprocessed data
+    #     self.save_data()
         
     #***************** preprocessing functions for each visualization ***********************
     @logger.catch

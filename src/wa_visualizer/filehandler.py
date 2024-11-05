@@ -18,26 +18,38 @@ class FileHandler():
     data: pd.DataFrame
     datafile: Path
 
-    def __init__(self, folders: Folders, config: Config):
+    def __init__(self, folders: Folders, config: Config, clean :bool = False):
         """
         Initializes the FileHandler with folder paths and configuration settings.
 
         Args:
             folders (Folders): An instance of the Folders class.
             config (Config): An instance of the Config class.
+            clean (Bool): if set tot True, cleaning step is required. Default is False.
         """
         self.folders = folders
-        self.data = self.load_data()
+
+        if clean:
+            # if cleaning required, load data from raw folder
+            self.data = self.load_data(self.folders.rawdatafile)
+        else:
+            # load data from processed folder
+            self.data = self.load_data(self.folders.datafile)
         self.config = config
 
-    def load_data(self) -> pd.DataFrame:
+    def load_data(self, filepath) -> pd.DataFrame:
         """
-        Loads data from a parquet file into a DataFrame.
+        Loads processed data from early steps from a parquet file into a DataFrame.
 
         Returns:
-            pd.DataFrame: The DataFrame containing the loaded data.
+            pd.DataFrame: The DataFrame containing the loaded processed data.
+            folder (str): folder to load the data from, current is default.
         """
-        return pd.read_parquet(self.folders.datafile)
+        print(self.folders)
+        print(filepath)
+        return pd.read_parquet(filepath)
+
+    
 
     def save_data(self) -> None:
         """

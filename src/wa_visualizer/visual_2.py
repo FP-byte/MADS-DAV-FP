@@ -26,10 +26,14 @@ class TimeSeriesPlot(BasicScatterPlot):
     color: str
     color_highlight: str
 
-    def __init__(self, title_fig: str, ylabel: str, xlabel: str, filename: str, config: Config, show_legend: bool = True):
+    def __init__(self, title_fig: str, ylabel: str, xlabel: str, filename: str, config: Config, vert_line_text:list, vert_line_period:list,show_legend: bool = True):
         super().__init__(config, title_fig, xlabel, ylabel, show_legend)
         self.filename = filename
         self.show_legend = show_legend
+        self.vertical_line_startdate = vert_line_period[0]
+        self.vertical_line_enddate = vert_line_period[1]
+        self.vertical_line_start_text = vert_line_text[0]
+        self.vertical_line_end_text = vert_line_text[1]
 
     def __call__(self, p: pd.DataFrame, p_corona: pd.DataFrame, **kwargs):
         """
@@ -62,8 +66,8 @@ class TimeSeriesPlot(BasicScatterPlot):
         moving_avg_plot_corona = self.plot_moving_average(p_corona, self.config.timestamp_col, 7, ax, color=self.color_highlight)
 
         # Define and draw vertical lines
-        vertical_line_start = VerticalLine('2020-13', 'Start Intelligent lockdown', 'right')
-        vertical_line_end = VerticalLine('2021-01', 'End Christmas lockdown', 'left')
+        vertical_line_start = VerticalLine(self.vertical_line_startdate, self.vertical_line_start_text, 'right')
+        vertical_line_end = VerticalLine(self.vertical_line_enddate, self.vertical_line_end_text, 'left')
 
         vertical_line_start(ax)
         vertical_line_end(ax)
@@ -110,6 +114,8 @@ class TimeSeriesPlotVisualizer(Preprocessor):
             xlabel="Datum: jaar-week",
             ylabel="Aantal berichten",
             filename="2_timeseries_visualization.png",
+            vert_line_period = ['2020-13', '2021-01'],
+            vert_line_text = ['Start Intelligent lockdown', 'End Christmas lockdown'],
             show_legend=False,  # Do not show legend in this plot
             config=self.config
         )
