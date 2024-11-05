@@ -1,6 +1,6 @@
 # Visualisaties van de cursu Data Analysis & Visualisation - Master Data science
-## Naam: Francesca Paulin Tumburus
-## Studentnr: 1882135
+### Francesca Paulin
+### Studentnr: 1882135
 
 This is the repository for the project within Master of Applied Data Science course "Data Analysis & Visualisation".
 
