@@ -20,38 +20,42 @@ class ScatterPlot(BasicPlot):
         metadata_lb (str, optional): Label for metadata used in hue. Defaults to "author".
         alpha (float, optional): Alpha transparency for the points. Defaults to 0.9.
     """
-    def __init__(self, title_fig: str, xlabel: str, ylabel: str, filename: str, custom_palette: list, metadata_lb: str = "author", alpha: float = 0.9, figsize: tuple = (20, 8)):
+
+    def __init__(self, title_fig: str, xlabel: str, ylabel: str, filename: str, custom_palette: list, ax, hue: str, metadata_lb: str = "topic", alpha: float = 0.9, figsize=(20, 8)):
         super().__init__(title_fig, xlabel, ylabel, filename, figsize)
         self.custom_palette = custom_palette
         self.metadata_lb = metadata_lb
         self.alpha = alpha
+        self.ax = ax  # Keep track of the axis for plotting
 
-    def plot(self, X: np.ndarray, emb):
+    def plot(self, X: np.ndarray, emb)->None:
         """
-        Plots a scatter plot using the given data and embeddings.
+        Plots a scatter plot using the given data and embeddings on the specified axis.
 
         Args:
             X (np.ndarray): Array of shape (n_samples, 2) containing the t-SNE coordinates.
             emb: Embeddings object containing metadata for labeling points.
+        Returns:
+            None: The function displays the plot 
         """
         labels = [emb.metadata[i][self.metadata_lb] for i in range(len(emb.metadata))]
-        sns.scatterplot(x=X[:, 0], y=X[:, 1], hue=labels, palette=self.custom_palette, alpha=self.alpha)
+        
+        # Pass ax explicitly to sns.scatterplot
+        sns.scatterplot(x=X[:, 0], y=X[:, 1], hue=labels, palette=self.custom_palette, alpha=self.alpha, ax=self.ax)
 
-        # Set the title, xlabel, and ylabel
-        plt.title(self.title_fig)
-        plt.xlabel(self.xlabel)
-        plt.ylabel(self.ylabel)
+        # Set the title, xlabel, and ylabel for the current axis
+        self.ax.set_title(self.title_fig)
+        self.ax.set_xlabel(self.xlabel)
+        self.ax.set_ylabel(self.ylabel)
 
         # Set ticks and grid
-        plt.xticks(np.arange(np.min(X[:, 0]), np.max(X[:, 0]) + 1, step=10))  # Adjust steps for visualization
-        plt.yticks(np.arange(np.min(X[:, 1]), np.max(X[:, 1]) + 1, step=10))
-        plt.grid(True)
+        self.ax.set_xticks(np.arange(np.floor(np.min(X[:, 0])), np.ceil(np.max(X[:, 0])) + 1, step=20))  # Round to nearest integer
+        self.ax.set_yticks(np.arange(np.floor(np.min(X[:, 1])), np.ceil(np.max(X[:, 1])) + 1, step=20))  # Round to nearest integer
 
-        # Show legend if applicable
-        if self.show_legend:
-            plt.legend(title=self.legend_title, bbox_to_anchor=(1.0, 1), loc='upper left')
+        self.ax.grid(True)
 
-        plt.tight_layout()
+        # If legend is needed, we can show it here
+        self.ax.legend(title=self.legend_title, bbox_to_anchor=(1.0, 1), loc='upper left')
 
 
 class TSNEPlotVisualizer:
@@ -67,6 +71,73 @@ class TSNEPlotVisualizer:
         self.preprocessor = preprocessor
         self.custom_palette = custom_palette
 
+    def plot_all_tsne(self, X, emb, custom_palette='dark', alpha=0.9, filename='5_tsne_visualization.png')->None:
+        """
+        Creates two side-by-side t-SNE scatter plots for visualizing the clustering of data based on 
+        topics and languages. The function uses the ScatterPlot class to create the plots and saves 
+        them as image files. The first plot shows the distribution of topics, and the second shows 
+        the distribution of languages.
+
+        Args:
+            X (np.ndarray): A 2D numpy array of shape (n_samples, 2) representing the t-SNE coordinates.
+            emb (object): An object that contains metadata for labeling the points in the scatter plot.
+                        It should have a `metadata` attribute that provides the 'topic' and 'language' labels.
+            custom_palette (str or list, optional): A color palette to use for the scatter plot. Default is 'dark'.
+            alpha (float, optional): The alpha transparency for the scatter plot points. Default is 0.9.
+            filename (str, optional): The name of the file to save the visualizations. Default is '5_tsne_visualization.png'.
+
+        Returns:
+            None: The function displays the plot and saves the second plot to a file.
+        """
+        # Create subplots (1 row, 2 columns)
+        fig, axs = plt.subplots(1, 2, figsize=(20, 8))  
+
+        # Extract labels from metadata
+        labels_1 = [emb.metadata[i][self.config.topic_col] for i in range(len(emb.metadata))]
+        labels_2 = [emb.metadata[i][self.config.language_col] for i in range(len(emb.metadata))]
+
+        # Create ScatterPlot instance for 'topic'
+        scatter_plot_1 = ScatterPlot(
+            title_fig='Focus en Flair: Gespreksonderwerpen die Ertoe Doen',
+            xlabel='t-SNE Component 1',
+            ylabel='t-SNE Component 2',
+            filename='5_tsne_topics_visualization.png',
+            metadata_lb="topic",
+            custom_palette=['darkblue', 'gray', 'green', 'lightgray'],
+            ax=axs[0],
+            hue=labels_1
+        )
+        # Plot using the ScatterPlot object
+        scatter_plot_1.plot(X, emb)
+
+        # Create ScatterPlot instance for 'language'
+        scatter_plot_2 = ScatterPlot(
+            title_fig='Van Pizza tot Strand: Italiaans is de Taal van Eten en Vakanties',
+            xlabel='t-SNE Component 1',
+            ylabel='t-SNE Component 2',
+            filename='5_tsne_visualization.png',
+            metadata_lb="language",
+            custom_palette=['darkblue', 'green'],
+            ax=axs[1],
+            hue=labels_2
+        )
+        # Plot using the ScatterPlot object
+        scatter_plot_2.plot(X, emb)
+        
+        # Save the second plot
+        scatter_plot_2.save()
+
+        # Set ticks and grid for the whole figure
+        # Adjust the xticks and yticks and round to nearest integer for a clean layout
+        plt.xticks(np.arange(np.floor(np.min(X[:, 0])), np.ceil(np.max(X[:, 0])) + 1, step=20))  
+        plt.yticks(np.arange(np.floor(np.min(X[:, 1])), np.ceil(np.max(X[:, 1])) + 1, step=20))  
+        plt.grid(True)
+
+        # Adjust layout and show plot
+        plt.tight_layout()
+        plt.show()
+
+      
     def visualization_week5(self):
         """
         Creates a t-SNE scatter plot visualization for week 5 data.
@@ -77,41 +148,12 @@ class TSNEPlotVisualizer:
         # Processing pipeline
         model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
         # Select subset with verbal messages
-        subset_verbal = df[df["language"] != 'Non-verbal'].reset_index(drop=True)
+        subset_verbal = df[df[self.config.language_col] != self.config.nonverbal_cat].reset_index(drop=True)
         # Select subset with message log length above 3
-        subset = subset_verbal[np.log(subset_verbal["message_length"]) >= 3].reset_index(drop=True)
+        subset = subset_verbal[np.log(subset_verbal[self.config.message_length_col]) >= 3].reset_index(drop=True)
         # Preprocessing step for t-SNE data
         X, emb = self.preprocessor.preprocess_week5(subset)  # Replace with actual method to get X and emb
 
-        #create scatterplot with title and filename
-        scatter_plot = ScatterPlot(
-            title_fig='Focus en Flair: Gespreksonderwerpen die Ertoe Doen',
-            xlabel='t-SNE Component 1',
-            ylabel='t-SNE Component 2',
-            filename='5_tsne_topics_visualization.png',
-            custom_palette=['darkblue',  'gray', 'green', 'lightgray'],
-            metadata_lb="topic"  
-        )
-        #plot data
-        scatter_plot.plot(X, emb)
-        #save plot
-        scatter_plot.save()
-        #show plot
-        scatter_plot.show_plot()
+        #create double scatterplot with title and filename
+        self.plot_all_tsne(X, emb)
         
-        #create scatterplot with title and filename
-        scatter_plot2 = ScatterPlot(
-            title_fig='Smakelijke Gesprekken: Voedselgesprekken zijn makkelijker in het Italiaans',
-            xlabel='t-SNE Component 1',
-            ylabel='t-SNE Component 2',
-            filename='5_tsne_language_visualization.png',
-            custom_palette=['gray',  'green'],
-            metadata_lb="language"  
-        )
-
-        #plot data
-        scatter_plot2.plot(X, emb)
-        #save plot
-        scatter_plot2.save()
-        #show plot
-        scatter_plot2.show_plot()

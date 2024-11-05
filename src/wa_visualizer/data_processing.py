@@ -127,9 +127,9 @@ class Preprocessor(FileHandler):
             text=text.strip().split(" ") 
             # Check for non-verbal indicators
             if '<Media' in row.message or 'http' in row.message or 'www.' in row.message:
-                self.data.at[idx, self.config.language_col] = "Non-verbal"
+                self.data.at[idx, self.config.language_col] = self.config.nonverbal_cat
             elif len(text) == 1 and row[self.config.has_emoji_col]:
-                self.data.at[idx, self.config.language_col] = 'Non-verbal'             
+                self.data.at[idx, self.config.language_col] = self.config.nonverbal_cat            
             else:
                 # detect language 
                 self.data.at[idx, self.config.language_col] = self.detect_language(text)
@@ -204,10 +204,10 @@ class Preprocessor(FileHandler):
                         percentages of verbal communication, sorted by the 'Verbal' counts.
         """
         # Grouping by author and language, counting occurrences
-        user_language_counts = data.groupby(['author', 'language']).size().unstack(fill_value=0)
+        user_language_counts = data.groupby([self.config.author_col, self.config.language_col]).size().unstack(fill_value=0)
 
         # Combine 'NL' and 'IT' language counts into a new 'Verbal' category
-        user_language_counts['Verbal'] = user_language_counts[['NL', 'IT']].sum(axis=1)
+        user_language_counts[self.config.verbal_cat] = user_language_counts[['NL', 'IT']].sum(axis=1)
 
         # Drop the original 'NL' and 'IT' columns as they are no longer needed
         user_language_counts.drop(['NL', 'IT'], inplace=True, axis=1)
@@ -216,13 +216,13 @@ class Preprocessor(FileHandler):
         total_counts = user_language_counts.sum(axis=1)
 
         # Sort the user_language_counts DataFrame by the 'Verbal' counts in descending order
-        sorted_user_language_counts = user_language_counts.sort_values(by='Verbal', ascending=False)
+        sorted_user_language_counts = user_language_counts.sort_values(by=self.config.verbal_cat, ascending=False)
 
         # Calculate percentages of each language count relative to the total counts
         percentages = self.calculate_percentage(sorted_user_language_counts, total_counts)
 
         # Sort the percentages DataFrame based on the 'Verbal' counts in descending order
-        percentages_sorted = percentages.sort_values(by='Verbal', ascending=False)
+        percentages_sorted = percentages.sort_values(by=self.config.verbal_cat, ascending=False)
 
         return percentages_sorted  # Return the sorted percentages DataFrame
     @logger.catch

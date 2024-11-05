@@ -68,6 +68,8 @@ class Config:
     homecoming_topic: str
     travel_topic: str
     food_topic: str
+    verbal_cat: str
+    nonverbal_cat: str
 
 
 @dataclass
@@ -151,10 +153,12 @@ basicConfig = Config(
         basic_color_highlight = 'salmon',
         color_vertical_line = '#EEE',
         people_topic = 'mensen',
-        other_topic = 'anders',
+        other_topic = 'overig',
         homecoming_topic ='kom thuis',
         travel_topic = 'reizen',
         food_topic ='eten',
+        verbal_cat = "Verbaal",
+        nonverbal_cat = "Non-verbaal"
     )
     
 keywordsFilter = BaseStrings(
@@ -164,14 +168,14 @@ keywordsFilter = BaseStrings(
             italian_frequentwords  = ['grazie', 'ciao', 'pizza', 'buon', 'nonni', 'nonno', 'nonna', 'dentro', 'essere',  'uffa', 'eh', 'immagino'],
             # Define keywords for each category
             topic_keywords = {
-                basicConfig.food_topic: ['kom naar', 'thuis', 'huis', 'naar huis', 'a casa', 'hoe laat', 'hoelaat', 'laat', 'slapen', 'slaap bij', 'donker', 'bed', 'thuis', 'huis', 'terug', 'blijf bij', 'ik ben in','onderweg', 'casa', 'notte', 'nacht', 'sleutel', 'blijven', 'vannacht'],
+                basicConfig.homecoming_topic: ['kom naar', 'thuis', 'huis', 'naar huis', 'a casa', 'hoe laat', 'hoelaat', 'laat', 'slapen', 'slaap bij', 'donker', 'bed', 'thuis', 'huis', 'terug', 'blijf bij', 'ik ben in','onderweg', 'casa', 'notte', 'nacht', 'sleutel', 'blijven', 'vannacht'],
                 basicConfig.travel_topic: [
                     'hilversum', 'amsterdam', 'reis', 'arrivati', 'aangekomen', 'vertrek', 'ingecheckt', 'bus', 'trein',
                     'dallas', 'spanje', 'mexico', 'boot', 'indonesië', 'hotel', 'florence', 'italie', 'schiphol', 'grado', 'tiare', 'ho chi minh', 
                 ],
                 basicConfig.food_topic: [
                     r'\beten\b', 'eet', "gegeten", 'blijf eten', 'lunch', 
-                    'pizza', 'pasta', 'mangia', 'pranzo', 'cena', 
+                    'pizza', 'pasta', 'mangia', 'pranzo', 'cena', 'afhalen', 'halen'
                     'prosciutto', 'kip', 'latte', 'snack', 
                     'indonesisch', 'kapsalon', 'kps', 'delfino', 
                     'ninh', 'bihn', 'spareribs', 'vis', 'restaurant'
