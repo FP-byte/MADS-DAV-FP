@@ -1,10 +1,11 @@
-# Visualisaties van de cursu Data Analysis & Visualisation - Master Data science
+### Visualisaties van de cursus Data Analysis & Visualisation - Master Data science
 
 
 This is the repository for the project within Master of Applied Data Science course "Data Analysis & Visualisation".
+
 Auteur: Francesca Paulin (Studentnr 1882135)
 
-# Setup the virtual environment
+### Setup the virtual environment
 1. First, make sure you have python >= 3.11. You can check the version with `python --version`.
 2. Make sure `rye` is there. Alternatively, use `pip` to install your environment.
     - check if it is installed by executing `rye --help`
@@ -12,7 +13,7 @@ Auteur: Francesca Paulin (Studentnr 1882135)
 4. run `rye sync`.
 
 
-# Run the visualisations
+### Run the visualisations
 
 Download a chat from Whatsapp and put it in the `data/processed` folder.
 In config.toml change the filename settings accordingly. 
