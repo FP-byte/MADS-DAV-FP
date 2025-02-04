@@ -3,7 +3,7 @@
 
 This is the repository for the project within Master of Applied Data Science course "Data Analysis & Visualisation".
 
-Auteur: Francesca Paulin (Studentnr 1882135)
+
 
 ### Setup the virtual environment
 1. First, make sure you have python >= 3.11. You can check the version with `python --version`.
